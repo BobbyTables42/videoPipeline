@@ -1,0 +1,465 @@
+{
+// ============================================================
+// AUSGABE
+// ============================================================
+
+// Dateiname des fertigen Reels.
+//
+// Relativer Pfad:
+//   "output": "reel.mp4"
+//
+// Unterordner:
+//   "output": "output/mein_reel.mp4"
+//
+// Auch absolute Pfade sind möglich.
+"output": "reel.mp4",
+
+
+// ============================================================
+// ALLGEMEINE EINSTELLUNGEN
+// ============================================================
+
+"settings": {
+
+    // --------------------------------------------------------
+    // VIDEOAUFLÖSUNG
+    // --------------------------------------------------------
+
+    // Breite des fertigen Videos in Pixeln.
+    //
+    // Typischer Wert für Instagram/TikTok:
+    //   1080
+    //
+    // Gültig: positive ganze Zahl.
+    "width": 1080,
+
+    // Höhe des fertigen Videos in Pixeln.
+    //
+    // Typischer Wert für Instagram/TikTok:
+    //   1920
+    //
+    // Zusammen mit width ergibt sich hier 9:16.
+    "height": 1920,
+
+    // Bilder pro Sekunde.
+    //
+    // Typischer Wert:
+    //   30
+    //
+    // Andere mögliche Werte:
+    //   24
+    //   25
+    //   30
+    //   50
+    //   60
+    //
+    // Gültig: positive ganze Zahl.
+    "fps": 30,
+
+
+    // --------------------------------------------------------
+    // SCHRIFTART
+    // --------------------------------------------------------
+
+    // Pfad zur TTF/OTF-Schriftdatei.
+    //
+    // Der Pfad kann absolut oder relativ zur config-Datei
+    // angegeben werden.
+    //
+    // Windows-Beispiel:
+    //   "font": "C:/Windows/Fonts/arial.ttf"
+    //
+    // Oder relativ:
+    //   "font": "fonts/DejaVuSans-Bold.ttf"
+    //
+    // Gültig:
+    //   Pfad zu einer vorhandenen Fontdatei.
+    //
+    // WICHTIG:
+    // Im aktuellen Compiler sollte diese Option unter
+    // settings stehen:
+    //
+    //   settings.font
+    //
+    // und nicht direkt unter der obersten config-Ebene.
+    "font": "fonts/DejaVuSans-Bold.ttf",
+
+
+    // --------------------------------------------------------
+    // TEXTSTIL
+    // --------------------------------------------------------
+
+    "text_style": {
+
+        // Schriftgröße in Pixeln.
+        //
+        // Beispiel:
+        //   64 = relativ große Schrift
+        //   80 = sehr groß
+        //
+        // Gültig: positive ganze Zahl.
+        "fontsize": 64,
+
+        // Schriftfarbe.
+        //
+        // Beispiele:
+        //   "white"
+        //   "black"
+        //   "red"
+        //   "#ffffff"
+        //
+        // FFmpeg-Farbformat verwenden.
+        "fontcolor": "white",
+
+        // Hintergrundfarbe der Textbox.
+        //
+        // Beispiele:
+        //   "black"
+        //   "black@0.45"
+        //   "white@0.7"
+        //
+        // Das @ gibt die Transparenz an.
+        // 1.0 = vollständig sichtbar
+        // 0.5 = 50 % sichtbar
+        // 0.0 = unsichtbar
+        "boxcolor": "black@0.45",
+
+        // Textbox ein- oder ausschalten.
+        //
+        //   1 = Box anzeigen
+        //   0 = keine Box
+        //
+        // Gültige Werte: 0 oder 1.
+        "box": 1,
+
+        // Breite des Randes zwischen Text und Box.
+        //
+        // Größerer Wert = mehr Abstand um den Text.
+        //
+        // Gültig: ganze Zahl >= 0.
+        "boxborderw": 18,
+
+        // Horizontaler Abstand des Textes vom Rand.
+        //
+        // Wird aktuell verwendet, um die vertikale
+        // Positionierung bzw. den Abstand oben/unten
+        // festzulegen.
+        //
+        // Gültig: ganze Zahl >= 0.
+        "margin_x": 60,
+
+        // Vertikaler Abstand vom oberen bzw. unteren Rand.
+        //
+        // Bei "top":
+        //   Abstand vom oberen Rand.
+        //
+        // Bei "bottom":
+        //   Abstand vom unteren Rand.
+        //
+        // Gültig: ganze Zahl >= 0.
+        "margin_y": 100
+    },
+
+
+    // --------------------------------------------------------
+    // ÜBERGÄNGE
+    // --------------------------------------------------------
+
+    // Übergang zwischen zwei Clips.
+    //
+    // Gültige Werte:
+    //
+    //   "cut"
+    //   "fade"
+    //   "fadeblack"
+    //   "fadewhite"
+    //   "wipeleft"
+    //   "wiperight"
+    //   "wipeup"
+    //   "wipedown"
+    //   "slideleft"
+    //   "slideright"
+    //   "slideup"
+    //   "slidedown"
+    //
+    // "cut" bedeutet harter Schnitt ohne Übergang.
+    "transition": "fade",
+
+    // Dauer des Übergangs in Sekunden.
+    //
+    // Beispiel:
+    //   0.25 = 250 Millisekunden
+    //   0.5  = eine halbe Sekunde
+    //   1.0  = eine Sekunde
+    //
+    // Bei "cut" wird dieser Wert nicht verwendet.
+    //
+    // Gültig: Zahl >= 0.
+    "transition_duration": 0.25,
+
+
+    // --------------------------------------------------------
+    // ORIGINALTON
+    // --------------------------------------------------------
+
+    // Standard-Lautstärke des Originaltons aller Clips.
+    //
+    // Beispiele:
+    //   1.0 = 100 %
+    //   0.5 = 50 %
+    //   0.0 = stumm
+    //
+    // Kann für jeden einzelnen Clip überschrieben werden.
+    "source_volume": 1.0,
+
+
+    // --------------------------------------------------------
+    // MUSIK FÜR DAS GESAMTE REEL
+    // --------------------------------------------------------
+
+    // Ein Lied, das über das komplette Reel gelegt wird.
+    //
+    // Der Pfad kann absolut oder relativ zur config-Datei
+    // angegeben werden.
+    //
+    // Wenn keine globale Musik gewünscht ist:
+    //
+    //   "music": null
+    //
+    // oder die Zeile einfach entfernen.
+    "music": "musik/reel_song.mp3",
+
+    // Lautstärke der globalen Musik.
+    //
+    // Beispiele:
+    //   1.0  = 100 %
+    //   0.5  = 50 %
+    //   0.18 = 18 %
+    //   0.0  = stumm
+    //
+    // Dieser Wert wird nur verwendet, wenn oben "music"
+    // angegeben wurde.
+    "music_volume": 0.18,
+
+
+    // --------------------------------------------------------
+    // VIDEO-CODIERUNG
+    // --------------------------------------------------------
+
+    // FFmpeg/x264 Preset.
+    //
+    // Typische Werte:
+    //   "ultrafast"
+    //   "superfast"
+    //   "veryfast"
+    //   "faster"
+    //   "fast"
+    //   "medium"
+    //   "slow"
+    //   "slower"
+    //
+    // "medium" ist ein guter Standard.
+    //
+    // Schneller = weniger Rechenzeit, größere Datei.
+    // Langsamer = mehr Rechenzeit, meist kleinere Datei
+    // bei gleicher Qualität.
+    "preset": "medium",
+
+    // H.264 Qualitätswert (CRF).
+    //
+    // Niedriger = bessere Qualität + größere Datei.
+    // Höher    = schlechtere Qualität + kleinere Datei.
+    //
+    // Typische Werte:
+    //   18 = sehr gute Qualität
+    //   20 = sehr gute Qualität
+    //   23 = guter Standard
+    //   28 = deutlich stärker komprimiert
+    //
+    // Gültiger praktischer Bereich:
+    //   etwa 0-51
+    //
+    // Für Social Media würde ich etwa 18-23 verwenden.
+    "crf": 20,
+
+    // Audio-Bitrate.
+    //
+    // Beispiele:
+    //   "128k"
+    //   "192k"
+    //   "256k"
+    //   "320k"
+    //
+    // 192k ist für normale Musik und Videos ein guter Wert.
+    "audio_bitrate": "192k"
+},
+
+
+// ============================================================
+// CLIPS
+// ============================================================
+
+// Die Clips werden exakt in dieser Reihenfolge verarbeitet.
+//
+// Jeder Clip benötigt:
+//
+//   file
+//   start
+//   end
+//
+// Optional:
+//
+//   text
+//   text_position
+//   source_volume
+//   music
+//   music_volume
+
+"clips": [
+
+    {
+        // ----------------------------------------------------
+        // VIDEO-DATEI
+        // ----------------------------------------------------
+
+        // Pfad zum Rohvideo.
+        //
+        // Relativ zur config-Datei oder absolut.
+        "file": "videos/video_001.mp4",
+
+
+        // ----------------------------------------------------
+        // START / ENDE
+        // ----------------------------------------------------
+
+        // Beginn des verwendeten Ausschnitts.
+        //
+        // Möglich:
+        //   "5"
+        //   "00:05"
+        //   "01:15"
+        //   "00:01:15.500"
+        //
+        // Auch Dezimalwerte sind erlaubt.
+        "start": "00:05",
+
+        // Ende des verwendeten Ausschnitts.
+        //
+        // Muss größer als start sein.
+        "end": "00:08",
+
+
+        // ----------------------------------------------------
+        // TEXT
+        // ----------------------------------------------------
+
+        // Text, der über diesem Clip angezeigt wird.
+        //
+        // Wenn kein Text gewünscht ist:
+        //
+        //   "text": ""
+        //
+        // oder die Option weglassen.
+        "text": "Dieser Blick...",
+
+        // Position des Textes.
+        //
+        // Gültige Werte:
+        //
+        //   "top"
+        //   "center"
+        //   "middle"
+        //   "bottom"
+        //
+        // "middle" ist ein Alias für "center".
+        "text_position": "top",
+
+
+        // ----------------------------------------------------
+        // ORIGINALTON DIESES CLIPS
+        // ----------------------------------------------------
+
+        // Lautstärke des Originaltons dieses Clips.
+        //
+        // Dieser Wert überschreibt den globalen
+        // settings.source_volume.
+        //
+        // Beispiele:
+        //   1.0 = 100 %
+        //   0.5 = 50 %
+        //   0.0 = stumm
+        "source_volume": 1.0,
+
+
+        // ----------------------------------------------------
+        // MUSIK DIESES CLIPS
+        // ----------------------------------------------------
+
+        // Eigener Song für diesen Clip.
+        //
+        // Wenn angegeben, wird dieser Song nur für diesen
+        // Clip verwendet.
+        //
+        // Wenn kein eigener Song gewünscht ist:
+        //
+        //   "music": null
+        //
+        // oder Option weglassen.
+        //
+        // ACHTUNG:
+        // Clip-Musik wird nur verwendet, wenn keine globale
+        // settings.music angegeben ist.
+        "music": "musik/lustig.mp3",
+
+        // Lautstärke des Songs dieses Clips.
+        //
+        // Beispiele:
+        //   1.0  = 100 %
+        //   0.5  = 50 %
+        //   0.18 = 18 %
+        //   0.0  = stumm
+        "music_volume": 0.18
+    },
+
+
+    {
+        // Beispiel für einen weiteren Clip.
+
+        "file": "videos/video_017.mp4",
+
+        "start": "01:15",
+        "end": "01:19",
+
+        "text": "wenn er Gassi hört",
+        "text_position": "center",
+
+        // Originalton etwas lauter.
+        "source_volume": 1.0,
+
+        // Kein eigener Song.
+        "music": null
+    },
+
+
+    {
+        // Beispiel:
+        // Musik komplett aus und Hundebellen hörbar.
+
+        "file": "videos/video_023.mp4",
+
+        "start": "00:02",
+        "end": "00:05",
+
+        "text": "und plötzlich...",
+        "text_position": "bottom",
+
+        // Originalton voll hörbar.
+        "source_volume": 1.0,
+
+        // Musik stumm.
+        "music": "musik/lustig.mp3",
+        "music_volume": 0.0
+    }
+]
+
+}

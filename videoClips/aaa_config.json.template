@@ -1,0 +1,217 @@
+{
+// ============================================================
+// EINGABE / AUSGABE
+// ============================================================
+
+"input": "../videoRaw/20260000_000000.mp4",
+"output": "__NAME_OF_CLIP__.mp4",
+
+
+// ============================================================
+// ZEITAUSSCHNITT
+// ============================================================
+
+// Start des Ausschnitts im Rohvideo.
+//   "5"
+//   "00:05"
+//   "01:15"
+//   "00:01:15.500"
+//   5.5
+//
+// Der Clip beginnt hier.
+"start": "00:05",
+
+// Ende des Ausschnitts.
+"end": "00:12",
+
+
+// ============================================================
+// ZIELFORMAT
+// ============================================================
+
+// Auflösung des fertigen Clips.
+"resolution": "1080x1920",
+
+
+// ============================================================
+// CROP-MODUS
+// ============================================================
+
+// Bestimmt, wie aus dem ursprünglichen Bild der gewünschte
+// Ausschnitt für das Zielformat erzeugt wird.
+//
+// ------------------------------------------------------------
+// "dog"
+// ------------------------------------------------------------
+//
+// Intelligenter Crop:
+//
+// Das lokale YOLO-Modell sucht Hunde im Video.
+// Der virtuelle Kameraausschnitt folgt dem Hund.
+//
+// Zusätzlich werden berücksichtigt:
+//
+//   - Größe des Hundes
+//   - Position des Hundes
+//   - Sicherheitsrand
+//   - Bewegung des Hundes
+//   - mehrere Hunde
+//   - kurzzeitige Fehldetektionen
+//
+// ------------------------------------------------------------
+// "center"
+// ------------------------------------------------------------
+//
+// Kein KI-Tracking.
+//
+// Es wird einfach ein Ausschnitt aus der Bildmitte verwendet.
+//
+// Dieser Modus ist schneller und benötigt kein YOLO-Modell.
+//
+// Gültige Werte:
+//
+//   "dog"
+//   "center"
+"crop": "dog",
+
+
+// ============================================================
+// YOLO-MODELL
+// ============================================================
+
+// Pfad bzw. Name des lokalen YOLO-Modells.
+//
+// Beispiel:
+//
+//   "yolo11n.pt"
+//
+// Beim ersten Verwenden lädt Ultralytics dieses Modell
+// gegebenenfalls automatisch herunter.
+//
+// Danach arbeitet die Erkennung lokal.
+//
+// Alternativ kann hier ein eigener lokaler Pfad angegeben
+// werden:
+//
+//   "models/yolo11n.pt"
+//
+// Gültig:
+// Pfad zu einem kompatiblen YOLO-Modell.
+"model": "yolo11n.pt",
+
+
+// ============================================================
+// ERKENNUNGSSICHERHEIT
+// ============================================================
+
+// Mindestwahrscheinlichkeit, mit der YOLO einen erkannten
+// Hund akzeptiert.
+//
+// Bereich:
+//
+//   0.0 bis 1.0
+//
+// Beispiele:
+//
+//   0.20 = viele Erkennungen, aber eventuell mehr Fehler
+//   0.35 = guter Ausgangswert
+//   0.50 = strengere Erkennung
+//   0.70 = sehr strenge Erkennung
+//
+// Wenn der Hund häufig übersehen wird:
+// Wert etwas reduzieren.
+//
+// Wenn viele falsche Erkennungen auftreten:
+// Wert erhöhen.
+"confidence": 0.35,
+
+
+// ============================================================
+// WIE OFT SOLL YOLO NACH DEM HUND SUCHEN?
+// ============================================================
+
+// Abstand zwischen zwei KI-Erkennungen in Sekunden.
+//   0.20 = ungefähr 5 Erkennungen pro Sekunde
+//   0.50 = ungefähr 2 Erkennungen pro Sekunde
+"detection_interval": 0.20,
+
+
+// ============================================================
+// KAMERA-GLÄTTUNG
+// ============================================================
+
+// Wie schnell die virtuelle Kamera auf eine neue Position
+// des Hundes reagiert.
+//   0.05 = sehr weich / langsam
+//   0.10 = weich
+//   0.25 = reagiert schneller
+//   0.50 = deutlich direkter
+//   0.80 = sehr schnelle Reaktion
+//   1.00 = praktisch keine Glättung
+"smoothing": 0.18,
+
+
+// ============================================================
+// SICHERHEITSRAND UM DEN HUND
+// ============================================================
+
+// Zusätzlicher Rand um die erkannte Hunde-Bounding-Box.
+//   0.10 = 10 % zusätzlicher Rand
+//   0.30 = 30 % zusätzlicher Rand
+"margin": 0.20,
+
+
+// ============================================================
+// GRUNDLEGENDER ZOOM
+// ============================================================
+
+// Grundsätzlicher Zoom-Faktor des intelligenten Crops.
+//
+//   1.00 = kein zusätzlicher Zoom
+//   1.05 = leicht näher
+//   1.15 = deutlich näher
+//   1.50 = stark näher
+"zoom": 1.05,
+
+
+// ============================================================
+// MINDEST-ZOOM
+// ============================================================
+
+// Untergrenze für den Zoom.
+//   1.00 = nicht herauszoomen
+//   0.90 = leicht herauszoomen erlaubt
+//   0.85 = etwas stärkeres Herauszoomen erlaubt
+"min_zoom": 0.85,
+
+
+// ============================================================
+// MAXIMALER ZOOM
+// ============================================================
+
+// Obergrenze für den Zoom.
+//   1.20 = relativ zurückhaltend
+//   1.35 = moderater Zoom
+//   1.50 = stärkerer Zoom
+"max_zoom": 1.35,
+
+
+// ============================================================
+// MEHRERE HUNDE
+// ============================================================
+
+// Verhalten, wenn mehrere Hunde erkannt werden.
+//   "all"        - Alle erkannten Hunde werden berücksichtigt.
+//   "largest"    - Nur der größte erkannte Hund wird verfolgt.
+//   "strongest"  - Es wird der Hund mit der höchsten Erkennungssicherheit verfolgt.
+"multi_dog_mode": "all",
+
+
+// ============================================================
+// OPTIONAL: KAMERA-PLAN SPEICHERN
+// ============================================================
+
+// für Debugging
+"save_camera_plan": false
+
+}
