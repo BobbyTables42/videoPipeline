@@ -1199,6 +1199,13 @@ def main():
 
     base = config_path.parent
 
+    doNotGenerate = config.get("doNotGenerate", False)
+    if doNotGenerate:
+        die(
+            f"Do Not Generate"
+        )
+
+
     # --------------------------------------------------------
     # Eingaben
     # --------------------------------------------------------

@@ -9,7 +9,10 @@ for filename in $(ls *.json); do
   filenameNoExtension=$(basename $filename .json)
   echo datei $filename - $filenameNoExtension
 
-  sed -i "s/__NAME_OF_CLIP__/$filenameNoExtension/g" $filename
+  # only if string is still present in file
+  if grep "__NAME_OF_CLIP__" $filename; then
+    sed -i "s/__NAME_OF_CLIP__/$filenameNoExtension/g" $filename
+  fi
 
   python ../scripts/clipexport.py $filename
 done
