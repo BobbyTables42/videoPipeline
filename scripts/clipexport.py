@@ -1199,8 +1199,8 @@ def main():
 
     base = config_path.parent
 
-    doNotGenerate = config.get("doNotGenerate", False)
-    if doNotGenerate:
+    generateClip = config.get("generateClip", False)
+    if not generateClip:
         die(
             f"Do Not Generate"
         )

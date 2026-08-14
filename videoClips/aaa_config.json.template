@@ -1,5 +1,5 @@
 {
-  "doNotGenerate": false,
+  "generateClip": true,
 
   "input": "../videoRaw/20260000_000000.mp4",
   "output": "__NAME_OF_CLIP__.mp4",
