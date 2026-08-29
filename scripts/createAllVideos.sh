@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-pushd ../videoClips > /dev/null
+pushd ../videoFinal > /dev/null
 
 for filename in $(ls *.json); do
 
@@ -14,17 +14,7 @@ for filename in $(ls *.json); do
     sed -i "s/__NAME_OF_OUTPUT__/$filenameNoExtension/g" $filename
   fi
 
-  # File is named like this '00002_20260823_164834.json'. Get the timestamp
-  timestamp="${filename#*_}"
-  timestamp="${timestamp%.json}"
-
-  # insert timestamp in file as input file name
-  if grep "__NAME_OF_INPUT__" $filename; then
-    sed -i "s/__NAME_OF_INPUT__/$timestamp/g" $filename
-  fi
-
-
-  python ../scripts/clipexport.py $filename
+  python ../scripts/reelcompile.py $filename
 done
 
 

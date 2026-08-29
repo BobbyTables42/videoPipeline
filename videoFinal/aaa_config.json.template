@@ -1,0 +1,59 @@
+{
+
+"output": "__NAME_OF_OUTPUT__.mp4",
+
+"settings": {
+
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+
+
+    "font": "fonts/DejaVuSans-Bold.ttf",
+
+    "text_style": {
+
+        "fontsize": 64,
+        "fontcolor": "white",
+        "boxcolor": "black@0.45",
+        "box": 1,
+        "boxborderw": 18,
+        "margin_x": 60,
+        "margin_y": 100
+    },
+
+
+    "transition": "fade",
+    "transition_duration": 0.25,
+
+
+    "source_volume": 1.0,
+    "music": "musik/reel_song.mp3",
+    "music_volume": 0.18,
+
+    "preset": "slow",
+    "crf": 15,
+    "audio_bitrate": "192k"
+},
+
+
+"clips": [
+
+    {
+        "file": "../videoClips/00001_*.mp4",
+
+        "start": "00:00",
+        "end": "00:20",
+
+        "text": "Dieser Blick...",
+        "text_position": "top",
+
+        "source_volume": 1.0,
+
+
+        "music": null,
+        "music_volume": 0.18
+    },
+]
+
+}
