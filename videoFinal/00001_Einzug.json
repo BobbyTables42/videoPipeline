@@ -1,0 +1,213 @@
+{
+
+"output": "00001_Einzug.mp4",
+
+"settings": {
+
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+
+
+    "font": "../fonts/folks/Folks-Bold.ttf",
+
+    "text_style": {
+
+        "fontsize": 80,
+        "fontcolor": "purple",
+        "boxcolor": "white@0.45",
+        "box": 1,
+        "boxborderw": 18,
+        "margin_x": 200,
+        "margin_y": 300
+    },
+
+
+    "transition": "fade",
+    "transition_duration": 0.75,
+
+
+    "source_volume": 1.0,
+    "music": "../music/alex-morgan-determination-motivational-speech-background-music-587391.mp3",
+    "music_volume": 1.0,
+    "music_start": "00:02",
+
+
+    "preset": "slower",
+    "crf": 15,
+    "audio_bitrate": "192k"
+},
+
+
+"clips": [
+
+    {
+        "file": "../videoClips/00001_20260823_111413.mp4",
+
+        "start": "00:01",
+        "end": "00:04",
+
+        "text": "700km Autobahn",
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.0
+    },
+
+    {
+        "file": "../videoClips/00002_20260823_164834.mp4",
+
+        "start": "00:03",
+        "end": "00:07",
+
+        "text": [
+            "um die kleine",
+            "Maus abzuholen"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.0
+    },
+
+    {
+        "file": "../videoClips/00003_20260823_184950.mp4",
+
+        "start": "00:00",
+        "end": "00:04",
+
+        "text": [
+            "sie hat fast die",
+            "ganze Fahrt verschlafen"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.0
+    },
+
+    {
+        "file": "../videoClips/00004_20260823_194942.mp4",
+
+        "start": "00:01",
+        "end": "00:05",
+
+        "text": [
+            "bis auf einige kurze",
+            "Zwischenstopps"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.0
+    },
+
+    {
+        "file": "../videoClips/00005_20260823_201224.mp4",
+
+        "start": "00:00",
+        "end": "00:07",
+
+        "text": [
+            "Vorsichtiges Erkunden des",
+            "neuen Zuhauses"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.0
+    },
+
+    {
+        "file": "../videoClips/00006_20260823_202053.mp4",
+
+        "start": "00:01",
+        "end": "00:05",
+
+        "text": [
+            "belohnt mit einer",
+            "ersten Mahlzeit"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.0
+    },
+
+    {
+        "file": "../videoClips/00007_20260823_202841.mp4",
+
+        "start": "00:06",
+        "end": "00:10",
+
+        "text": [
+            "Kurz darauf Erkunden",
+            "des Gartens"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.0
+    },
+
+    {
+        "file": "../videoClips/00008_20260823_203242.mp4",
+
+        "start": "00:00",
+        "end": "00:06",
+
+        "text": [
+            "Antesten der",
+            "Spielzeuge"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.0
+    },
+
+    {
+        "file": "../videoClips/00009_20260823_204639.mp4",
+
+        "start": "00:00",
+        "end": "00:06",
+
+        "text": [
+            "Erste Gewöhnung an",
+            "die Schlafbox"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.0
+    },
+
+    {
+        "file": "../videoClips/00010_20260823_213722.mp4",
+
+        "start": "00:00",
+        "end": "00:07",
+
+        "text": [
+            "und dann ab ins Land",
+            "der Träume.",
+            "Was ein aufregender Tag"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.0
+    }
+]
+
+}

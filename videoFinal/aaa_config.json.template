@@ -9,7 +9,7 @@
     "fps": 30,
 
 
-    "font": "fonts/DejaVuSans-Bold.ttf",
+    "font": "../fonts/folks/Folks-Bold.ttf",
 
     "text_style": {
 
@@ -28,10 +28,11 @@
 
 
     "source_volume": 1.0,
-    "music": "musik/reel_song.mp3",
+    "music": "../music/alex-morgan-determination-motivational-speech-background-music-587391.mp3",
     "music_volume": 0.18,
+    "music_start": "00:00",
 
-    "preset": "slow",
+    "preset": "ultrafast",
     "crf": 15,
     "audio_bitrate": "192k"
 },
@@ -40,17 +41,18 @@
 "clips": [
 
     {
-        "file": "../videoClips/00001_*.mp4",
+        "file": "__CLIP_00000_CLIP__",
 
         "start": "00:00",
-        "end": "00:20",
+        "end": "00:00",
 
-        "text": "Dieser Blick...",
+        "text": [
+            "",
+            ""
+        ],
         "text_position": "top",
 
         "source_volume": 1.0,
-
-
         "music": null,
         "music_volume": 0.18
     },
