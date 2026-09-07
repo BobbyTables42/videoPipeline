@@ -1,47 +1,8 @@
 #!/usr/bin/env python3
-
-"""
-reel_compiler.py
-
-Erzeugt aus einer JSON-Konfiguration ein fertiges Reel.
-
-Funktionen
-----------
-- Clips in beliebiger Reihenfolge
-- Start/Ende pro Clip
-- end = "00:00" bedeutet: bis zum Ende des Quellvideos
-- Ausgabeauflösung und FPS konfigurierbar
-- Text pro Clip als Array
-- beliebig viele Textzeilen
-- Textposition: top / center / bottom
-- Textzeilen werden einzeln gerendert
-- keine temporären Textdateien
-- einheitlicher Übergang zwischen Clips
-- Originalton pro Clip konfigurierbar
-- Videos ohne Audiospur werden automatisch mit Stille versehen
-- globale Musik für das komplette Reel
-- oder Musik pro Clip
-- music_start zum Überspringen des Anfangs eines Songs
-- Musiklautstärke konfigurierbar
-- vollständig lokal
-
-Aufruf
-------
-    python reel_compiler.py reel.json
-
-Voraussetzung
--------------
-FFmpeg und FFprobe müssen im PATH verfügbar sein.
-
-Test:
-    ffmpeg -version
-    ffprobe -version
-"""
-
-
-from __future__ import annotations
+# -*- coding: utf-8 -*-
 
 import json
+import os
 import shlex
 import subprocess
 import sys
@@ -49,286 +10,73 @@ from pathlib import Path
 
 
 # ============================================================
-# Defaults
+# Helpers
 # ============================================================
 
-DEFAULT_WIDTH = 1080
-DEFAULT_HEIGHT = 1920
-DEFAULT_FPS = 30
-
-DEFAULT_FONT_SIZE = 64
-DEFAULT_FONT_COLOR = "white"
-DEFAULT_BOX_COLOR = "black@0.45"
-DEFAULT_BOX = 1
-DEFAULT_BOX_BORDER = 18
-
-DEFAULT_MARGIN_X = 60
-DEFAULT_MARGIN_Y = 100
-
-DEFAULT_TRANSITION = "fade"
-DEFAULT_TRANSITION_DURATION = 0.25
-
-DEFAULT_SOURCE_VOLUME = 1.0
-
-DEFAULT_MUSIC_VOLUME = 0.18
-
-DEFAULT_PRESET = "medium"
-DEFAULT_CRF = 20
-DEFAULT_AUDIO_BITRATE = "192k"
-
-
-# ============================================================
-# Fehler
-# ============================================================
-
-def die(message: str) -> None:
-    print()
-    print(f"FEHLER: {message}", file=sys.stderr)
+def die(message):
+    print(f"ERROR: {message}", file=sys.stderr)
     sys.exit(1)
 
 
-# ============================================================
-# FFmpeg
-# ============================================================
-
-def run_command(command: list[str]) -> None:
-    print()
-    print("$")
-    print(
-        " ".join(
-            shlex.quote(str(x))
-            for x in command
-        )
-    )
-    print()
-
-    result = subprocess.run(command)
+def run(cmd):
+    print("\n>>", " ".join(shlex.quote(str(x)) for x in cmd))
+    result = subprocess.run(cmd)
 
     if result.returncode != 0:
-        die("FFmpeg ist mit einem Fehler beendet worden.")
+        die(f"FFmpeg beendet mit Fehlercode {result.returncode}")
 
 
-def check_ffmpeg() -> None:
-    try:
-        subprocess.run(
-            ["ffmpeg", "-version"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=True,
-        )
-
-        subprocess.run(
-            ["ffprobe", "-version"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=True,
-        )
-
-    except Exception:
-        die(
-            "FFmpeg/FFprobe wurde nicht gefunden. "
-            "Bitte FFmpeg installieren und sicherstellen, "
-            "dass ffmpeg und ffprobe im PATH liegen."
-        )
-
-
-# ============================================================
-# FFprobe
-# ============================================================
-
-def ffprobe(
-    arguments: list[str],
-) -> str:
-
-    command = [
-        "ffprobe",
-        "-v",
-        "error",
-        *arguments,
-    ]
-
-    try:
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-
-        return result.stdout.strip()
-
-    except subprocess.CalledProcessError as exc:
-        die(
-            "FFprobe konnte eine Mediendatei nicht analysieren."
-        )
-
-    return ""
-
-
-def get_duration(path: Path) -> float:
-
-    result = ffprobe(
-        [
-            "-show_entries",
-            "format=duration",
-            "-of",
-            "default=noprint_wrappers=1:nokey=1",
-            str(path),
-        ]
+def run_capture(cmd):
+    result = subprocess.run(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
     )
 
-    try:
-        return float(result)
-
-    except ValueError:
-        die(
-            f"Videodauer konnte nicht ermittelt werden:\n{path}"
-        )
-
-    return 0.0
-
-
-def has_audio(path: Path) -> bool:
-
-    result = ffprobe(
-        [
-            "-select_streams",
-            "a:0",
-            "-show_entries",
-            "stream=index",
-            "-of",
-            "csv=p=0",
-            str(path),
-        ]
-    )
-
-    return bool(result.strip())
-
-
-# ============================================================
-# Zeit
-# ============================================================
-
-def parse_time(value) -> float:
-    """
-    Unterstützt:
-
-        5
-        5.5
-        "00:05"
-        "01:15"
-        "01:15.5"
-        "00:01:15"
-        "00:01:15.500"
-    """
-
-    if isinstance(value, (int, float)):
-        return float(value)
-
-    value = str(value).strip()
-
-    if not value:
-        raise ValueError(
-            "Leere Zeitangabe."
-        )
-
-    if ":" not in value:
-        return float(value)
-
-    parts = value.split(":")
-
-    if len(parts) == 2:
-
-        minutes = int(parts[0])
-        seconds = float(parts[1])
-
-        return (
-            minutes * 60
-            + seconds
-        )
-
-    if len(parts) == 3:
-
-        hours = int(parts[0])
-        minutes = int(parts[1])
-        seconds = float(parts[2])
-
-        return (
-            hours * 3600
-            + minutes * 60
-            + seconds
-        )
-
-    raise ValueError(
-        f"Ungültige Zeitangabe: {value}"
-    )
-
-
-# ============================================================
-# Pfade
-# ============================================================
-
-def resolve_path(
-    value: str | None,
-    base: Path,
-) -> Path | None:
-
-    if value is None:
+    if result.returncode != 0:
         return None
 
-    path = Path(str(value))
-
-    if not path.is_absolute():
-        path = base / path
-
-    return path.resolve()
+    return result.stdout.strip()
 
 
-# ============================================================
-# FFmpeg Escaping
-# ============================================================
-
-def escape_filter_value(value: str) -> str:
-    """
-    Escaping für Werte innerhalb eines FFmpeg-Filters.
-    """
-
-    return (
-        str(value)
-        .replace("\\", r"\\")
-        .replace(":", r"\:")
-        .replace(",", r"\,")
-        .replace(";", r"\;")
-        .replace("[", r"\[")
-        .replace("]", r"\]")
-        .replace("'", r"\'")
+def require_program(name):
+    result = subprocess.run(
+        ["which", name],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
     )
 
+    if result.returncode != 0:
+        die(f"{name} wurde nicht gefunden.")
 
-def escape_drawtext_text(text: str) -> str:
+
+def label(name):
     """
-    Escaping für drawtext:text.
+    FFmpeg-Filterlabel.
 
     Wichtig:
-    Es werden KEINE Zeilenumbrüche erzeugt.
-    Jede Textzeile bekommt später ihren eigenen
-    drawtext-Filter.
-
-    Dadurch können CR/LF/BOM-Probleme nicht auftreten.
+    Intern werden Labels OHNE [] gespeichert.
+    Erst hier werden sie geklammert.
     """
+    return f"[{name}]"
 
-    text = str(text)
 
-    # Eventuelle Steuerzeichen entfernen.
-    text = text.replace("\r", "")
-    text = text.replace("\n", "")
-    text = text.replace("\ufeff", "")
+def ff_escape(value):
+    text = str(value)
 
+    # Steuerzeichen entfernen
+    text = text.replace("\r", "").replace("\n", "").replace("\ufeff", "")
+
+    # Erst Backslashes escapen
+    text = text.replace("\\", r"\\")
+
+    # FFmpeg-spezifische Trennzeichen & Leerzeichen escapen
     return (
         text
-        .replace("\\", r"\\")
-        .replace("'", r"\'")
+        .replace(" ", r"\ ")
         .replace(":", r"\:")
+        .replace("'", r"\'")
         .replace(",", r"\,")
         .replace(";", r"\;")
         .replace("[", r"\[")
@@ -337,1354 +85,1189 @@ def escape_drawtext_text(text: str) -> str:
     )
 
 
-# ============================================================
-# Font
-# ============================================================
+def parse_time(value):
+    """
+    Akzeptiert:
+      5
+      5.5
+      00:05
+      00:00:05
+      00:00
 
-def get_font_path(
-    settings: dict,
-    base: Path,
-) -> str:
+    None / leer => None
 
-    configured = settings.get("font")
+    00:00 wird beim 'end'-Wert speziell behandelt:
+    => Ende der Quelle
+    """
+    if value is None:
+        return None
 
-    if configured:
+    if isinstance(value, (int, float)):
+        return float(value)
 
-        path = resolve_path(
-            configured,
-            base,
-        )
+    value = str(value).strip()
 
-        if path is None or not path.exists():
+    if not value:
+        return None
 
-            die(
-                "Die in settings.font angegebene "
-                f"Schriftart wurde nicht gefunden:\n{path}"
-            )
+    if ":" not in value:
+        return float(value)
 
-        print(
-            f"Schriftart: {path}"
-        )
+    parts = value.split(":")
 
-        return str(path)
+    if len(parts) == 2:
+        minutes = float(parts[0])
+        seconds = float(parts[1])
+        return minutes * 60 + seconds
 
-    # Linux-Defaults
-    candidates = [
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf",
-        "/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf",
+    if len(parts) == 3:
+        hours = float(parts[0])
+        minutes = float(parts[1])
+        seconds = float(parts[2])
+
+        return hours * 3600 + minutes * 60 + seconds
+
+    raise ValueError(f"Ungültige Zeitangabe: {value}")
+
+
+def get_media_info(path):
+    """
+    Liefert:
+      duration
+      has_video
+      has_audio
+    """
+
+    cmd = [
+        "ffprobe",
+        "-v", "error",
+        "-show_entries",
+        "format=duration",
+        "-show_entries",
+        "stream=codec_type",
+        "-of",
+        "json",
+        str(path)
     ]
 
-    for candidate in candidates:
-
-        path = Path(candidate)
-
-        if path.exists():
-
-            print(
-                f"Schriftart: {path}"
-            )
-
-            return str(path)
-
-    die(
-        "Keine Schriftart gefunden. "
-        "Bitte settings.font in der config.json setzen."
+    result = subprocess.run(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
     )
 
-    return ""
+    if result.returncode != 0:
+        die(
+            f"ffprobe konnte Datei nicht lesen:\n"
+            f"{path}\n\n"
+            f"{result.stderr}"
+        )
+
+    try:
+        data = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        die(f"Ungültige ffprobe-Ausgabe für {path}")
+
+    duration = float(
+        data.get("format", {}).get("duration") or 0
+    )
+
+    streams = data.get("streams", [])
+
+    has_video = any(
+        s.get("codec_type") == "video"
+        for s in streams
+    )
+
+    has_audio = any(
+        s.get("codec_type") == "audio"
+        for s in streams
+    )
+
+    return {
+        "duration": duration,
+        "has_video": has_video,
+        "has_audio": has_audio,
+    }
+
+
+def resolve_path(base_dir, filename):
+    path = Path(filename)
+
+    if not path.is_absolute():
+        path = base_dir / path
+
+    return path.resolve()
 
 
 # ============================================================
 # Text
 # ============================================================
 
-def normalize_text(
-    text,
-) -> list[str]:
+def normalize_text(text):
+    """
+    JSON text:
+      "Hallo"
+
+    oder:
+      ["Hallo", "zweite Zeile"]
+
+    oder:
+      ["Hallo", "", "dritte Zeile"]
+
+    Leere Zeilen werden entfernt.
+    """
 
     if text is None:
         return []
 
     if isinstance(text, str):
-
-        # Aus Kompatibilitätsgründen akzeptieren wir einen
-        # einzelnen String weiterhin.
-        #
-        # Für die eigentliche Konfiguration wird aber ein
-        # Array empfohlen.
         return [text]
 
-    if not isinstance(text, list):
+    if isinstance(text, list):
+        result = []
 
-        raise ValueError(
-            "'text' muss ein Array sein."
-        )
+        for item in text:
+            if item is None:
+                continue
 
-    result = []
+            item = str(item)
 
-    for line in text:
+            if item.strip() == "":
+                continue
 
-        line = str(line)
+            result.append(item)
 
-        # Steuerzeichen entfernen.
-        line = line.replace("\r", "")
-        line = line.replace("\n", "")
-        line = line.replace("\ufeff", "")
+        return result
 
-        result.append(line)
+    return [str(text)]
 
-    return result
+
+def get_text_y(position, line_count, fontsize, height, margin_y):
+    """
+    Position bezieht sich auf den GESAMTEN Textblock.
+
+    top:
+      Block oben
+
+    center:
+      Block vertikal zentriert
+
+    bottom:
+      Block unten
+    """
+
+    line_height = fontsize * 1.25
+    block_height = line_count * line_height
+
+    position = str(position or "center").lower()
+
+    if position == "top":
+        return margin_y
+
+    if position == "bottom":
+        return f"(h-{margin_y}-{block_height:.3f})"
+
+    # center
+    return f"((h-{block_height:.3f})/2)"
 
 
 def add_text_filters(
-    filters: list[str],
-    input_label: str,
-    output_label: str,
-    text,
-    position: str,
-    font: str,
-    fontsize: int,
-    fontcolor: str,
-    box: int,
-    boxcolor: str,
-    boxborderw: int,
-    margin_x: int,
-    margin_y: int,
-) -> str:
-    """
-    Fügt für jede Textzeile einen eigenen drawtext-Filter hinzu.
-
-    Dadurch gibt es keine Probleme mit:
-        - CR
-        - LF
-        - BOM
-        - FFmpeg textfile
-
-    Alle Zeilen werden horizontal zentriert.
-
-    top / center / bottom beziehen sich auf den kompletten
-    Textblock.
-    """
-
-    lines = normalize_text(text)
-
-    if not lines:
-
+    filters,
+    input_label,
+    output_label,
+    text_lines,
+    text_position,
+    settings
+):
+    # WENN KEIN TEXT: Direkt umbenennen/durchreichen via null-Filter
+    if not text_lines:
         filters.append(
-            f"{input_label}copy"
-            f"[{output_label}]"
+            f"{label(input_label)}copy{label(output_label)}"
+        )
+        return
+
+    style = settings.get("text_style", {})
+
+    fontsize = int(style.get("fontsize", 64))
+    fontcolor = style.get("fontcolor", "white")
+
+    box = int(style.get("box", 1))
+    boxcolor = style.get("boxcolor", "black@0.45")
+    boxborderw = int(style.get("boxborderw", 18))
+
+    margin_y = int(style.get("margin_y", 100))
+
+    font = settings.get("font")
+
+    if not font:
+        die(
+            "settings.font fehlt.\n"
+            "Beispiel:\n"
+            "\"font\": \"/pfad/zur/font.ttf\""
         )
 
-        return output_label
+    font = Path(font)
 
-    position = position.lower()
+    line_height = fontsize * 1.25
 
-    if position == "middle":
-        position = "center"
-
-    if position not in (
-        "top",
-        "center",
-        "bottom",
-    ):
-
-        raise ValueError(
-            f"Ungültige Textposition: {position}"
-        )
-
-    # --------------------------------------------------------
-    # Geschätzte Zeilenhöhe.
-    #
-    # drawtext verwendet intern eine etwas größere Höhe als
-    # die reine fontsize.  1.25 ist ein guter Wert für normale
-    # Schriftarten.
-    # --------------------------------------------------------
-
-    line_height = int(
-        fontsize * 1.4
+    block_y = get_text_y(
+        text_position,
+        len(text_lines),
+        fontsize,
+        1920,
+        margin_y
     )
-
-    line_count = len(lines)
-
-    total_height = (
-        line_count * line_height
-    )
-
-    # --------------------------------------------------------
-    # Position des gesamten Blocks
-    # --------------------------------------------------------
-
-    if position == "top":
-
-        block_y = (
-            margin_y
-        )
-
-    elif position == "center":
-
-        block_y = (
-            f"(h-{total_height})/2"
-        )
-
-    else:
-
-        block_y = (
-            f"h-{total_height}-{margin_y}"
-        )
 
     current = input_label
 
-    # --------------------------------------------------------
-    # Jede Zeile bekommt ihren eigenen drawtext-Filter.
-    # --------------------------------------------------------
+    for index, text in enumerate(text_lines):
 
-    for index, line in enumerate(lines):
+        if index == len(text_lines) - 1:
+            current_output = output_label
+        else:
+            current_output = f"{output_label}_line_{index}"
 
-        escaped = escape_drawtext_text(
-            line
+        y_expression = (
+            f"({block_y})+{index * line_height:.3f}"
         )
 
-        if position == "center":
-
-            y = (
-                f"({block_y})+"
-                f"{index * line_height}"
-            )
-
-        else:
-
-            y = (
-                f"({block_y})+"
-                f"{index * line_height}"
-            )
-
-        # Letzte Zeile bekommt direkt den gewünschten
-        # output_label.
-        if index == len(lines) - 1:
-
-            next_label = output_label
-
-        else:
-
-            next_label = (
-                f"text_{output_label}_{index}"
-            )
+        text_escaped = ff_escape(text)
+        font_escaped = ff_escape(str(font))
 
         drawtext = (
-            f"[{current}]"
             f"drawtext="
-            f"fontfile='{escape_filter_value(font)}'"
-            f":text='{escaped}'"
-            f":fontcolor={escape_filter_value(fontcolor)}"
-            f":fontsize={fontsize}"
-            f":x=(w-text_w)/2"
-            f":y={y}"
-            f":box={box}"
-            f":boxcolor={escape_filter_value(boxcolor)}"
-            f":boxborderw={boxborderw}"
-            f"[{next_label}]"
+            f"fontfile={font_escaped}:"
+            f"text={text_escaped}:"
+            f"fontcolor={fontcolor}:"
+            f"fontsize={fontsize}:"
+            f"x=(w-text_w)/2:"
+            f"y={y_expression}:"
+            f"box={box}:"
+            f"boxcolor={boxcolor}:"
+            f"boxborderw={boxborderw}"
         )
 
         filters.append(
-            drawtext
+            f"{label(current)}{drawtext}{label(current_output)}"
         )
 
-        current = next_label
-
-    return output_label
+        current = current_output
 
 
 # ============================================================
-# Clip validieren
+# Video / Image
 # ============================================================
 
-def prepare_clip(
-    clip: dict,
-    index: int,
-    base: Path,
-) -> dict:
+def add_video_segment(
+    filters,
+    clip,
+    index,
+    input_index,
+    duration,
+    settings
+):
+    """
+    Video als normiertes 1080x1920-Segment.
+    """
 
-    if "file" not in clip:
+    width = int(settings.get("width", 1080))
+    height = int(settings.get("height", 1920))
+    fps = int(settings.get("fps", 30))
 
-        die(
-            f"Clip {index}: 'file' fehlt."
-        )
+    start = parse_time(clip.get("start"))
 
-    if "start" not in clip:
+    end_value = clip.get("end")
 
-        die(
-            f"Clip {index}: 'start' fehlt."
-        )
+    # end = 00:00 => echte Quelle bis zum Ende
+    if end_value is not None:
+        parsed_end = parse_time(end_value)
 
-    if "end" not in clip:
+        if parsed_end == 0:
+            parsed_end = None
+    else:
+        parsed_end = None
 
-        die(
-            f"Clip {index}: 'end' fehlt."
-        )
+    input_label = f"{input_index}:v"
 
-    path = resolve_path(
-        clip["file"],
-        base,
-    )
+    base = f"base_{index}"
 
-    if path is None or not path.exists():
+    chain = [
+        f"scale={width}:{height}:force_original_aspect_ratio=decrease",
+        f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2",
+        "setsar=1",
+        f"fps={fps}",
+        "format=yuv420p",
+    ]
 
-        die(
-            f"Clip {index}: Datei nicht gefunden:\n{path}"
-        )
+    if start is not None and start > 0:
+        chain.insert(0, f"trim=start={start:.6f}")
 
-    try:
-
-        start = parse_time(
-            clip["start"]
-        )
-
-        end = parse_time(
-            clip["end"]
-        )
-
-    except ValueError as exc:
-
-        die(
-            f"Clip {index}: {exc}"
-        )
-
-    duration = get_duration(
-        path
-    )
-
-    # --------------------------------------------------------
-    # end == 00:00
-    #
-    # bedeutet:
-    # bis zum tatsächlichen Ende des Videos.
-    # --------------------------------------------------------
-
-    if end == 0:
-
-        end = duration
-
-    if start < 0:
-
-        die(
-            f"Clip {index}: start darf nicht negativ sein."
-        )
-
-    if start >= duration:
-
-        die(
-            f"Clip {index}: start liegt hinter dem Ende "
-            f"des Videos ({duration:.3f}s)."
-        )
-
-    if end > duration:
-
-        # Kleine Rundungsabweichungen tolerieren.
-        if end - duration < 0.1:
-
-            end = duration
-
+    if parsed_end is not None:
+        if start is not None:
+            clip_duration = max(parsed_end - start, 0.01)
+            chain.append(f"trim=duration={clip_duration:.6f}")
         else:
+            clip_duration = max(parsed_end, 0.01)
+            chain.append(f"trim=duration={clip_duration:.6f}")
+    else:
+        # Dauer bereits vorher bestimmt
+        if start is not None:
+            chain.append(f"trim=duration={duration:.6f}")
 
-            die(
-                f"Clip {index}: end ({end:.3f}s) liegt "
-                f"hinter dem Ende des Videos "
-                f"({duration:.3f}s)."
-            )
+    chain.extend([
+        "settb=AVTB",
+        "setpts=PTS-STARTPTS",
+    ])
+    filters.append(label(input_label) + ",".join(chain) + label(base))
 
-    if end <= start:
+    text_lines = normalize_text(clip.get("text"))
 
-        die(
-            f"Clip {index}: end muss größer als start sein."
-        )
-
-    clip_duration = (
-        end - start
+    add_text_filters(
+        filters=filters,
+        input_label=base,
+        output_label=f"v{index}",
+        text_lines=text_lines,
+        text_position=clip.get("text_position", "center"),
+        settings=settings
     )
 
-    if clip_duration < 0.05:
 
-        die(
-            f"Clip {index}: Der Ausschnitt ist zu kurz."
-        )
+def add_image_segment(
+    filters,
+    clip,
+    index,
+    input_index,
+    duration,
+    settings
+):
+    """
+    Bild wird wie ein Video behandelt:
+      - auf 1080x1920 gebracht
+      - für duration angezeigt
+      - mit PTS versehen
+      - optional Text
+    """
 
-    audio = has_audio(
-        path
+    width = int(settings.get("width", 1080))
+    height = int(settings.get("height", 1920))
+    fps = int(settings.get("fps", 30))
+
+    base = f"base_{index}"
+
+    chain = [
+        f"scale={width}:{height}:force_original_aspect_ratio=decrease",
+        f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2",
+        "setsar=1",
+        f"fps={fps}",
+        "format=yuv420p",
+        f"trim=duration={duration:.6f}",
+        "settb=AVTB",
+        "setpts=PTS-STARTPTS"
+    ]
+
+    filters.append(label(f"{input_index}:v") + ",".join(chain) + label(base))
+
+    text_lines = normalize_text(clip.get("text"))
+
+    add_text_filters(
+        filters=filters,
+        input_label=base,
+        output_label=f"v{index}",
+        text_lines=text_lines,
+        text_position=clip.get("text_position", "center"),
+        settings=settings
     )
 
-    # --------------------------------------------------------
-    # Text
-    # --------------------------------------------------------
 
-    try:
+# ============================================================
+# Audio
+# ============================================================
 
-        text = normalize_text(
-            clip.get(
-                "text",
-                [],
-            )
-        )
+def add_video_audio(
+    filters,
+    clip,
+    index,
+    input_index,
+    duration,
+    has_audio,
+    settings
+):
+    """
+    Audio eines Videos.
 
-    except ValueError as exc:
+    Falls kein Audio vorhanden:
+      anullsrc
 
-        die(
-            f"Clip {index}: {exc}"
-        )
+    Damit funktioniert der Clip trotzdem.
+    """
 
-    text_position = str(
+    source_volume = float(
         clip.get(
-            "text_position",
-            "bottom",
+            "source_volume",
+            settings.get("source_volume", 1.0)
         )
-    ).lower()
-
-    if text_position == "middle":
-
-        text_position = "center"
-
-    if text_position not in (
-        "top",
-        "center",
-        "bottom",
-    ):
-
-        die(
-            f"Clip {index}: Ungültige text_position "
-            f"'{text_position}'. "
-            f"Erlaubt: top, center, bottom."
-        )
-
-    # --------------------------------------------------------
-    # Musik
-    # --------------------------------------------------------
-
-    music = clip.get(
-        "music"
     )
 
-    if music:
+    out = f"src_a{index}"
 
-        music_path = resolve_path(
-            music,
-            base,
+    if has_audio:
+        chain = [
+            "aresample=48000",
+            "aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo",
+            f"volume={source_volume}",
+            f"atrim=duration={duration:.6f}",
+            "asetpts=PTS-STARTPTS",
+        ]
+        filters.append(label(f"{input_index}:a") + ",".join(chain) + label(out))
+
+    else:
+        filters.append(
+            f"anullsrc="
+            f"channel_layout=stereo:"
+            f"sample_rate=48000,"
+            f"atrim=duration={duration:.6f},"
+            f"asetpts=PTS-STARTPTS"
+            f"{label(out)}"
         )
 
-        if music_path is None or not music_path.exists():
 
+def add_silent_audio(
+    filters,
+    index,
+    duration
+):
+    out = f"src_a{index}"
+
+    filters.append(
+        f"anullsrc="
+        f"channel_layout=stereo:"
+        f"sample_rate=48000,"
+        f"atrim=duration={duration:.6f},"
+        f"asetpts=PTS-STARTPTS"
+        f"{label(out)}"
+    )
+
+
+# ============================================================
+# Durations
+# ============================================================
+
+def determine_clip_duration(clip, media_info):
+    clip_type = clip.get("type", "video").lower()
+
+    if clip_type == "image":
+        duration = clip.get("duration")
+
+        if duration is None:
             die(
-                f"Clip {index}: Musikdatei nicht gefunden:\n"
-                f"{music_path}"
+                f"Bild-Element benötigt 'duration':\n{clip}"
             )
 
-        music = str(
-            music_path
-        )
+        duration = float(duration)
 
-    music_start = clip.get(
-        "music_start",
-        0,
-    )
+        if duration <= 0:
+            die(
+                f"Bild-duration muss > 0 sein:\n{clip}"
+            )
 
-    try:
+        return duration
 
-        music_start = parse_time(
-            music_start
-        )
+    # Video
+    source_duration = media_info["duration"]
 
-    except ValueError as exc:
+    start = parse_time(clip.get("start"))
 
+    if start is None:
+        start = 0.0
+
+    end_value = clip.get("end")
+
+    if end_value is None:
+        end = source_duration
+
+    else:
+        parsed_end = parse_time(end_value)
+
+        # 00:00 = Ende der Quelle
+        if parsed_end == 0:
+            end = source_duration
+        else:
+            end = parsed_end
+
+    duration = end - start
+
+    if duration <= 0:
         die(
-            f"Clip {index}: Ungültiges music_start: {exc}"
+            f"Video hat eine ungültige Dauer:\n"
+            f"{clip}\n"
+            f"Quelle: {source_duration:.3f}s"
         )
 
-    return {
-        "path": path,
-        "start": start,
-        "end": end,
-        "duration": clip_duration,
-        "has_audio": audio,
-        "text": text,
-        "text_position": text_position,
-
-        "source_volume": float(
-            clip.get(
-                "source_volume",
-                DEFAULT_SOURCE_VOLUME,
-            )
-        ),
-
-        "music": music,
-
-        "music_start": music_start,
-
-        "music_volume": float(
-            clip.get(
-                "music_volume",
-                DEFAULT_MUSIC_VOLUME,
-            )
-        ),
-    }
+    return min(duration, max(source_duration - start, 0.01))
 
 
 # ============================================================
-# Main Build
+# Music
 # ============================================================
 
-def build(
-    config_path: Path,
-) -> None:
+def add_music(
+    filters,
+    clip,
+    index,
+    input_index,
+    total_duration,
+    settings
+):
+    """
+    Musik für ein einzelnes Element.
 
-    # --------------------------------------------------------
-    # JSON laden
-    # --------------------------------------------------------
+    clip['music'] überschreibt globale Musik für diesen Clip.
+    """
 
-    try:
+    music = clip.get("music")
 
-        config = json.loads(
-            config_path.read_text(
-                encoding="utf-8"
-            )
-        )
+    if not music:
+        return None
 
-    except Exception as exc:
-
-        die(
-            f"Config konnte nicht gelesen werden:\n{exc}"
-        )
-
-    base = config_path.parent
-
-    settings = config.get(
-        "settings",
-        {}
-    )
-
-    clips_config = config.get(
-        "clips",
-        []
-    )
-
-    if not isinstance(
-        clips_config,
-        list,
-    ) or not clips_config:
-
-        die(
-            "Die Config enthält keine Clips."
-        )
-
-    # ========================================================
-    # Allgemeine Einstellungen
-    # ========================================================
-
-    width = int(
-        settings.get(
-            "width",
-            DEFAULT_WIDTH,
+    music_volume = float(
+        clip.get(
+            "music_volume",
+            settings.get("music_volume", 0.18)
         )
     )
 
-    height = int(
-        settings.get(
-            "height",
-            DEFAULT_HEIGHT,
+    music_start = parse_time(
+        clip.get(
+            "music_start",
+            settings.get("music_start", "00:00")
         )
+    ) or 0.0
+
+    out = f"element_music_{index}"
+
+    filters.append(
+        f"{label(f'{input_index}:a')}"
+        f"aresample=48000,"
+        f"aformat=sample_fmts=fltp:"
+        f"sample_rates=48000:"
+        f"channel_layouts=stereo,"
+        f"atrim=start={music_start:.6f},"
+        f"asetpts=PTS-STARTPTS,"
+        f"volume={music_volume},"
+        f"atrim=duration={total_duration:.6f},"
+        f"asetpts=PTS-STARTPTS"
+        f"{label(out)}"
     )
 
-    fps = int(
-        settings.get(
-            "fps",
-            DEFAULT_FPS,
+    return out
+
+
+def add_global_music(
+    filters,
+    music_input_index,
+    music_start,
+    music_volume,
+    total_duration
+):
+    """
+    Globale Musik wird am Anfang abgeschnitten und
+    anschließend auf die Reel-Länge begrenzt.
+
+    Falls das Musikstück kürzer ist als das Reel,
+    wird es geloopt.
+    """
+
+    out = "global_music_a"
+
+    start = parse_time(music_start) or 0.0
+
+    filters.append(
+        f"{label(f'{music_input_index}:a')}"
+        f"aresample=48000,"
+        f"aformat=sample_fmts=fltp:"
+        f"sample_rates=48000:"
+        f"channel_layouts=stereo,"
+        f"atrim=start={start:.6f},"
+        f"asetpts=PTS-STARTPTS,"
+        f"volume={music_volume},"
+        f"aloop=loop=-1:size=2147483647,"
+        f"atrim=duration={total_duration:.6f},"
+        f"asetpts=PTS-STARTPTS"
+        f"{label(out)}"
+    )
+
+    return out
+
+
+# ============================================================
+# Main compiler
+# ============================================================
+
+def main():
+    require_program("ffmpeg")
+    require_program("ffprobe")
+
+    if len(sys.argv) < 2:
+        print(
+            "Verwendung:\n"
+            "  python3 reel_compiler.py config.json"
         )
+        sys.exit(1)
+
+    config_path = Path(sys.argv[1]).resolve()
+
+    if not config_path.exists():
+        die(f"Config nicht gefunden: {config_path}")
+
+    with open(
+        config_path,
+        "r",
+        encoding="utf-8-sig"
+    ) as f:
+        config = json.load(f)
+
+    base_dir = config_path.parent
+
+    settings = config.get("settings", {})
+    clips = config.get("clips", [])
+
+    if not clips:
+        die("Keine clips in der Config.")
+
+    width = int(settings.get("width", 1080))
+    height = int(settings.get("height", 1920))
+    fps = int(settings.get("fps", 30))
+
+    transition = settings.get(
+        "transition",
+        "fade"
     )
-
-    # ========================================================
-    # Text
-    # ========================================================
-
-    text_style = settings.get(
-        "text_style",
-        {}
-    )
-
-    fontsize = int(
-        text_style.get(
-            "fontsize",
-            DEFAULT_FONT_SIZE,
-        )
-    )
-
-    fontcolor = str(
-        text_style.get(
-            "fontcolor",
-            DEFAULT_FONT_COLOR,
-        )
-    )
-
-    boxcolor = str(
-        text_style.get(
-            "boxcolor",
-            DEFAULT_BOX_COLOR,
-        )
-    )
-
-    box = int(
-        text_style.get(
-            "box",
-            DEFAULT_BOX,
-        )
-    )
-
-    boxborderw = int(
-        text_style.get(
-            "boxborderw",
-            DEFAULT_BOX_BORDER,
-        )
-    )
-
-    margin_x = int(
-        text_style.get(
-            "margin_x",
-            DEFAULT_MARGIN_X,
-        )
-    )
-
-    margin_y = int(
-        text_style.get(
-            "margin_y",
-            DEFAULT_MARGIN_Y,
-        )
-    )
-
-    font = get_font_path(
-        settings,
-        base,
-    )
-
-    # ========================================================
-    # Übergang
-    # ========================================================
-
-    transition = str(
-        settings.get(
-            "transition",
-            DEFAULT_TRANSITION,
-        )
-    ).lower()
 
     transition_duration = float(
         settings.get(
             "transition_duration",
-            DEFAULT_TRANSITION_DURATION,
+            0.25
         )
     )
 
-    supported_transitions = {
-        "cut",
-        "fade",
-        "fadeblack",
-        "fadewhite",
-        "wipeleft",
-        "wiperight",
-        "wipeup",
-        "wipedown",
-        "slideleft",
-        "slideright",
-        "slideup",
-        "slidedown",
-    }
-
-    if transition not in supported_transitions:
-
-        die(
-            f"Unbekannter Übergang '{transition}'.\n"
-            f"Erlaubt: "
-            f"{', '.join(sorted(supported_transitions))}"
-        )
-
-    # ========================================================
-    # Globale Musik
-    # ========================================================
-
-    global_music = settings.get(
-        "music"
-    )
-
-    global_music_start = parse_time(
-        settings.get(
-            "music_start",
-            0,
-        )
-    )
-
-    global_music_volume = float(
-        settings.get(
-            "music_volume",
-            DEFAULT_MUSIC_VOLUME,
-        )
-    )
-
-    if global_music:
-
-        global_music_path = resolve_path(
-            global_music,
-            base,
-        )
-
-        if (
-            global_music_path is None
-            or not global_music_path.exists()
-        ):
-
-            die(
-                f"Globale Musikdatei nicht gefunden:\n"
-                f"{global_music_path}"
-            )
-
-        global_music = str(
-            global_music_path
-        )
-
-    # ========================================================
-    # Ausgabe
-    # ========================================================
-
-    output = config.get(
-        "output",
-        "reel.mp4",
-    )
-
-    output_path = resolve_path(
-        output,
-        base,
-    )
-
-    if output_path is None:
-
-        die(
-            "Ungültiger output-Pfad."
-        )
-
-    output_path.parent.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    # ========================================================
-    # Clips vorbereiten
-    # ========================================================
-
-    clips = []
-
-    for index, clip_config in enumerate(
-        clips_config,
-        start=1,
-    ):
-
-        print(
-            f"Analysiere Clip {index}/{len(clips_config)}..."
-        )
-
-        clip = prepare_clip(
-            clip_config,
-            index,
-            base,
-        )
-
-        clips.append(
-            clip
-        )
-
-        print(
-            f"  Datei:   {clip['path']}"
-        )
-
-        print(
-            f"  Bereich: "
-            f"{clip['start']:.3f}s - "
-            f"{clip['end']:.3f}s"
-        )
-
-        print(
-            f"  Länge:   "
-            f"{clip['duration']:.3f}s"
-        )
-
-        print(
-            f"  Audio:   "
-            f"{'ja' if clip['has_audio'] else 'nein'}"
-        )
-
-    # ========================================================
-    # FFmpeg Command
-    # ========================================================
-
-    command = [
-        "ffmpeg",
-        "-y",
-    ]
-
-    # ========================================================
-    # Video Inputs
-    # ========================================================
-
-    for clip in clips:
-
-        command += [
-            "-ss",
-            f"{clip['start']:.6f}",
-
-            "-to",
-            f"{clip['end']:.6f}",
-
-            "-i",
-            str(clip["path"]),
-        ]
-
-    # ========================================================
-    # Stille-Audio Inputs
-    #
-    # Für jeden Clip ohne Audio wird ein eigener anullsrc-Input
-    # angelegt.
-    # ========================================================
-
-    silent_indices = {}
-
-    next_input_index = len(clips)
-
-    for index, clip in enumerate(clips):
-
-        if not clip["has_audio"]:
-
-            command += [
-                "-f",
-                "lavfi",
-
-                "-t",
-                f"{clip['duration']:.6f}",
-
-                "-i",
-                "anullsrc="
-                "channel_layout=stereo:"
-                "sample_rate=48000",
-            ]
-
-            silent_indices[index] = (
-                next_input_index
-            )
-
-            next_input_index += 1
-
-    # ========================================================
-    # Musik Inputs
-    # ========================================================
-
-    music_indices = {}
-
-    # --------------------------------------------------------
-    # Globale Musik
-    # --------------------------------------------------------
-
-    if global_music:
-
-        command += [
-            "-stream_loop",
-            "-1",
-
-            "-ss",
-            f"{global_music_start:.6f}",
-
-            "-i",
-            global_music,
-        ]
-
-        music_indices["global"] = (
-            next_input_index
-        )
-
-        next_input_index += 1
-
-    # --------------------------------------------------------
-    # Musik pro Clip
-    # --------------------------------------------------------
-
-    if not global_music:
-
-        for index, clip in enumerate(clips):
-
-            if clip["music"]:
-
-                command += [
-                    "-stream_loop",
-                    "-1",
-
-                    "-ss",
-                    f"{clip['music_start']:.6f}",
-
-                    "-i",
-                    clip["music"],
-                ]
-
-                music_indices[index] = (
-                    next_input_index
-                )
-
-                next_input_index += 1
-
-    # ========================================================
-    # Filter
-    # ========================================================
-
-    filters = []
-
-    # ========================================================
-    # Video Filters
-    # ========================================================
-
-    for index, clip in enumerate(clips):
-
-        input_video = (
-            f"{index}:v"
-        )
-
-        base_label = (
-            f"scaled_{index}"
-        )
-
-        # ----------------------------------------------------
-        # Einheitliches Format
-        # ----------------------------------------------------
-
-        filters.append(
-            f"[{input_video}]"
-            f"scale="
-            f"{width}:{height}:"
-            f"force_original_aspect_ratio=decrease,"
-            f"pad="
-            f"{width}:{height}:"
-            f"(ow-iw)/2:"
-            f"(oh-ih)/2,"
-            f"setsar=1,"
-            f"fps={fps},"
-            f"format=yuv420p"
-            f"[{base_label}]"
-        )
-
-        # ----------------------------------------------------
-        # Text
-        # ----------------------------------------------------
-
-        text = clip["text"]
-
-        if text:
-
-            try:
-
-                add_text_filters(
-                    filters=filters,
-                    input_label=f"{base_label}",
-                    output_label=f"v{index}",
-                    text=text,
-                    position=clip["text_position"],
-                    font=font,
-                    fontsize=fontsize,
-                    fontcolor=fontcolor,
-                    box=box,
-                    boxcolor=boxcolor,
-                    boxborderw=boxborderw,
-                    margin_x=margin_x,
-                    margin_y=margin_y,
-                )
-
-            except ValueError as exc:
-
-                die(
-                    f"Clip {index + 1}: {exc}"
-                )
-
-        else:
-
-            filters.append(
-                f"[{base_label}]"
-                f"copy"
-                f"[v{index}]"
-            )
-
-    # ========================================================
-    # Audio Filters
-    # ========================================================
-
-    for index, clip in enumerate(clips):
-
-        source_volume = (
-            clip["source_volume"]
-        )
-
-        if clip["has_audio"]:
-
-            audio_input = (
-                f"{index}:a"
-            )
-
-            filters.append(
-                f"[{audio_input}]"
-                f"aresample=48000,"
-                f"volume={source_volume},"
-                f"atrim="
-                f"duration={clip['duration']:.6f},"
-                f"asetpts=PTS-STARTPTS"
-                f"[a{index}]"
-            )
-
-        else:
-
-            silent_index = (
-                silent_indices[index]
-            )
-
-            filters.append(
-                f"[{silent_index}:a]"
-                f"aresample=48000,"
-                f"volume={source_volume},"
-                f"atrim="
-                f"duration={clip['duration']:.6f},"
-                f"asetpts=PTS-STARTPTS"
-                f"[a{index}]"
-            )
-
-    # ========================================================
-    # Video Übergänge
-    # ========================================================
-
-    current_video = "v0"
-
-    current_video_duration = (
-        clips[0]["duration"]
-    )
-
-    for index in range(
-        1,
-        len(clips),
-    ):
-
-        duration = min(
-            transition_duration,
-            clips[index]["duration"] / 2,
-            current_video_duration / 2,
-        )
-
-        output_label = (
-            f"vx{index}"
-        )
-
-        if transition == "cut":
-
-            filters.append(
-                f"[{current_video}]"
-                f"[v{index}]"
-                f"concat="
-                f"n=2:"
-                f"v=1:"
-                f"a=0"
-                f"[{output_label}]"
-            )
-
-            current_video_duration += (
-                clips[index]["duration"]
-            )
-
-        else:
-
-            offset = (
-                current_video_duration
-                - duration
-            )
-
-            filters.append(
-                f"[{current_video}]"
-                f"[v{index}]"
-                f"xfade="
-                f"transition={transition}:"
-                f"duration={duration:.6f}:"
-                f"offset={offset:.6f}"
-                f"[{output_label}]"
-            )
-
-            current_video_duration += (
-                clips[index]["duration"]
-                - duration
-            )
-
-        current_video = (
-            output_label
-        )
-
-    # ========================================================
-    # Audio / Musik pro Clip
-    # ========================================================
-
-    if global_music:
-
-        # ----------------------------------------------------
-        # Zuerst den Originalton aller Clips mit ihren
-        # Übergängen zusammenbauen.
-        # ----------------------------------------------------
-
-        current_audio = "a0"
-
-        current_audio_duration = (
-            clips[0]["duration"]
-        )
-
-        for index in range(
-            1,
-            len(clips),
-        ):
-
-            duration = min(
-                transition_duration,
-                clips[index]["duration"] / 2,
-                current_audio_duration / 2,
-            )
-
-            output_label = (
-                f"ax{index}"
-            )
-
-            if transition == "cut":
-
-                filters.append(
-                    f"[{current_audio}]"
-                    f"[a{index}]"
-                    f"concat="
-                    f"n=2:"
-                    f"v=0:"
-                    f"a=1"
-                    f"[{output_label}]"
-                )
-
-                current_audio_duration += (
-                    clips[index]["duration"]
-                )
-
-            else:
-
-                filters.append(
-                    f"[{current_audio}]"
-                    f"[a{index}]"
-                    f"acrossfade="
-                    f"d={duration:.6f}:"
-                    f"c1=tri:"
-                    f"c2=tri"
-                    f"[{output_label}]"
-                )
-
-                current_audio_duration += (
-                    clips[index]["duration"]
-                    - duration
-                )
-
-            current_audio = (
-                output_label
-            )
-
-        # ----------------------------------------------------
-        # Globale Musik
-        # ----------------------------------------------------
-
-        music_input = (
-            music_indices["global"]
-        )
-
-        filters.append(
-            f"[{music_input}:a]"
-            f"aresample=48000,"
-            f"volume={global_music_volume},"
-            f"atrim="
-            f"duration={current_audio_duration:.6f},"
-            f"asetpts=PTS-STARTPTS"
-            f"[global_music]"
-        )
-
-        filters.append(
-            f"[{current_audio}]"
-            f"[global_music]"
-            f"amix="
-            f"inputs=2:"
-            f"duration=first:"
-            f"dropout_transition=0"
-            f"[final_audio]"
-        )
-
-        final_audio = (
-            "final_audio"
-        )
-
-    else:
-
-        # ----------------------------------------------------
-        # Musik pro Clip.
-        #
-        # Zuerst wird Musik jeweils in den einzelnen Clip
-        # gemischt.
-        # ----------------------------------------------------
-
-        clip_audio_labels = []
-
-        for index, clip in enumerate(clips):
-
-            if index in music_indices:
-
-                music_input = (
-                    music_indices[index]
-                )
-
-                filters.append(
-                    f"[{music_input}:a]"
-                    f"aresample=48000,"
-                    f"volume={clip['music_volume']},"
-                    f"atrim="
-                    f"duration={clip['duration']:.6f},"
-                    f"asetpts=PTS-STARTPTS"
-                    f"[music_{index}]"
-                )
-
-                filters.append(
-                    f"[a{index}]"
-                    f"[music_{index}]"
-                    f"amix="
-                    f"inputs=2:"
-                    f"duration=first:"
-                    f"dropout_transition=0"
-                    f"[mixed_{index}]"
-                )
-
-                clip_audio_labels.append(
-                    f"mixed_{index}"
-                )
-
-            else:
-
-                clip_audio_labels.append(
-                    f"a{index}"
-                )
-
-        # ----------------------------------------------------
-        # Jetzt Clip-Audios mit Übergängen verbinden.
-        # ----------------------------------------------------
-
-        current_audio = (
-            clip_audio_labels[0]
-        )
-
-        current_audio_duration = (
-            clips[0]["duration"]
-        )
-
-        for index in range(
-            1,
-            len(clips),
-        ):
-
-            duration = min(
-                transition_duration,
-                clips[index]["duration"] / 2,
-                current_audio_duration / 2,
-            )
-
-            output_label = (
-                f"mx{index}"
-            )
-
-            if transition == "cut":
-
-                filters.append(
-                    f"[{current_audio}]"
-                    f"[{clip_audio_labels[index]}]"
-                    f"concat="
-                    f"n=2:"
-                    f"v=0:"
-                    f"a=1"
-                    f"[{output_label}]"
-                )
-
-                current_audio_duration += (
-                    clips[index]["duration"]
-                )
-
-            else:
-
-                filters.append(
-                    f"[{current_audio}]"
-                    f"[{clip_audio_labels[index]}]"
-                    f"acrossfade="
-                    f"d={duration:.6f}:"
-                    f"c1=tri:"
-                    f"c2=tri"
-                    f"[{output_label}]"
-                )
-
-                current_audio_duration += (
-                    clips[index]["duration"]
-                    - duration
-                )
-
-            current_audio = (
-                output_label
-            )
-
-        final_audio = (
-            current_audio
-        )
-
-    # ========================================================
-    # Filter Complex
-    # ========================================================
-
-    filter_complex = ";".join(
-        filters
-    )
-
-    # ========================================================
-    # Encoder
-    # ========================================================
-
-    preset = str(
-        settings.get(
-            "preset",
-            DEFAULT_PRESET,
-        )
+    preset = settings.get(
+        "preset",
+        "medium"
     )
 
     crf = int(
         settings.get(
             "crf",
-            DEFAULT_CRF,
+            20
         )
     )
 
-    audio_bitrate = str(
-        settings.get(
-            "audio_bitrate",
-            DEFAULT_AUDIO_BITRATE,
-        )
+    audio_bitrate = settings.get(
+        "audio_bitrate",
+        "192k"
     )
 
-    # ========================================================
-    # Finaler FFmpeg-Aufruf
-    # ========================================================
+    # --------------------------------------------------------
+    # Font
+    # --------------------------------------------------------
 
-    command += [
+    font = settings.get("font")
+
+    if not font:
+        die(
+            "settings.font fehlt."
+        )
+
+    font_path = resolve_path(
+        base_dir,
+        font
+    )
+
+    if not font_path.exists():
+        die(
+            f"Font nicht gefunden:\n"
+            f"{font_path}"
+        )
+
+    settings["font"] = str(font_path)
+
+    # --------------------------------------------------------
+    # Resolve clips
+    # --------------------------------------------------------
+
+    resolved_clips = []
+
+    total_duration = 0.0
+
+    for index, clip in enumerate(clips):
+
+        clip_type = clip.get(
+            "type",
+            "video"
+        ).lower()
+
+        if clip_type not in ("video", "image"):
+            die(
+                f"Clip {index}: unbekannter type '{clip_type}'. "
+                f"Erlaubt: video, image"
+            )
+
+        filename = clip.get("file")
+
+        if not filename:
+            die(
+                f"Clip {index}: 'file' fehlt."
+            )
+
+        path = resolve_path(
+            base_dir,
+            filename
+        )
+
+        if not path.exists():
+            die(
+                f"Datei nicht gefunden:\n"
+                f"{path}"
+            )
+
+        info = get_media_info(path)
+
+        if clip_type == "video":
+
+            if not info["has_video"]:
+                die(
+                    f"Datei enthält keinen Videostream:\n"
+                    f"{path}"
+                )
+
+        duration = determine_clip_duration(
+            clip,
+            info
+        )
+
+        resolved_clips.append({
+            "clip": clip,
+            "type": clip_type,
+            "path": path,
+            "info": info,
+            "duration": duration,
+        })
+
+        total_duration += duration
+
+    print(
+        f"\nReel-Dauer: {total_duration:.3f} Sekunden"
+    )
+
+    # --------------------------------------------------------
+    # Inputs
+    # --------------------------------------------------------
+
+    inputs = []
+    input_meta = []
+
+    for item in resolved_clips:
+
+        clip_type = item["type"]
+        path = item["path"]
+        duration = item["duration"]
+
+        if clip_type == "image":
+
+            inputs.extend([
+                "-loop",
+                "1",
+                "-framerate",
+                str(fps),
+                "-t",
+                f"{duration:.6f}",
+                "-i",
+                str(path)
+            ])
+
+        else:
+
+            # Videos normal einlesen
+            inputs.extend([
+                "-i",
+                str(path)
+            ])
+
+        input_meta.append({
+            "input_index": len(input_meta),
+            **item
+        })
+
+    # --------------------------------------------------------
+    # Global music
+    # --------------------------------------------------------
+
+    global_music = settings.get("music")
+
+    global_music_input_index = None
+
+    if global_music:
+        global_music_path = resolve_path(
+            base_dir,
+            global_music
+        )
+
+        if not global_music_path.exists():
+            die(
+                f"Globale Musik nicht gefunden:\n"
+                f"{global_music_path}"
+            )
+
+        global_music_input_index = len(input_meta)
+
+        inputs.extend([
+            "-stream_loop",
+            "-1",
+            "-i",
+            str(global_music_path)
+        ])
+
+    # --------------------------------------------------------
+    # Per-element music
+    #
+    # Wichtig:
+    # Musikdateien werden nur dann als Input hinzugefügt,
+    # wenn ein Clip explizit 'music' besitzt.
+    # --------------------------------------------------------
+
+    element_music_inputs = {}
+
+    for index, item in enumerate(resolved_clips):
+
+        music = item["clip"].get("music")
+
+        if not music:
+            continue
+
+        music_path = resolve_path(
+            base_dir,
+            music
+        )
+
+        if not music_path.exists():
+            die(
+                f"Musik für Clip {index} nicht gefunden:\n"
+                f"{music_path}"
+            )
+
+        music_input_index = len(input_meta)
+
+        inputs.extend([
+            "-stream_loop",
+            "-1",
+            "-i",
+            str(music_path)
+        ])
+
+        element_music_inputs[index] = music_input_index
+
+    # --------------------------------------------------------
+    # Filter graph
+    # --------------------------------------------------------
+
+    filters = []
+
+    # --------------------------------------------------------
+    # Video + Audio pro Clip
+    # --------------------------------------------------------
+
+    for index, item in enumerate(resolved_clips):
+
+        clip = item["clip"]
+        clip_type = item["type"]
+        duration = item["duration"]
+
+        #input_index = item["input_index"]
+        input_index = index
+
+        if clip_type == "video":
+
+            add_video_segment(
+                filters=filters,
+                clip=clip,
+                index=index,
+                input_index=input_index,
+                duration=duration,
+                settings=settings
+            )
+
+            add_video_audio(
+                filters=filters,
+                clip=clip,
+                index=index,
+                input_index=input_index,
+                duration=duration,
+                has_audio=item["info"]["has_audio"],
+                settings=settings
+            )
+
+        else:
+
+            add_image_segment(
+                filters=filters,
+                clip=clip,
+                index=index,
+                input_index=input_index,
+                duration=duration,
+                settings=settings
+            )
+
+            add_silent_audio(
+                filters=filters,
+                index=index,
+                duration=duration
+            )
+
+    # --------------------------------------------------------
+    # Video transitions
+    # --------------------------------------------------------
+
+    if len(resolved_clips) == 1:
+
+        final_video_label = "v0"
+
+    else:
+
+        current_video = "v0"
+        accumulated_duration = resolved_clips[0]["duration"]
+
+        for index in range(1, len(resolved_clips)):
+
+            current_duration = resolved_clips[index]["duration"]
+
+            transition_duration_actual = min(
+                transition_duration,
+                resolved_clips[index - 1]["duration"] / 2,
+                current_duration / 2
+            )
+
+            if transition_duration_actual <= 0:
+                transition_duration_actual = 0.01
+
+            offset = (
+                accumulated_duration
+                - transition_duration_actual
+            )
+
+            next_video = f"v{index}"
+            output = f"video_transition_{index}"
+
+            filters.append(
+                f"{label(current_video)}"
+                f"{label(next_video)}"
+                f"xfade="
+                f"transition={ff_escape(transition)}:"
+                f"duration={transition_duration_actual:.6f}:"
+                f"offset={offset:.6f}"
+                f"{label(output)}"
+            )
+
+            current_video = output
+
+            accumulated_duration += (
+                current_duration
+                - transition_duration_actual
+            )
+
+        final_video_label = current_video
+
+    # --------------------------------------------------------
+    # Audio transitions
+    # --------------------------------------------------------
+
+    if len(resolved_clips) == 1:
+
+        final_audio_label = "src_a0"
+
+    else:
+
+        current_audio = "src_a0"
+
+        for index in range(1, len(resolved_clips)):
+
+            prev_duration = resolved_clips[index - 1]["duration"]
+            current_duration = resolved_clips[index]["duration"]
+
+            audio_transition_duration = min(
+                transition_duration,
+                prev_duration / 2,
+                current_duration / 2
+            )
+
+            if audio_transition_duration <= 0:
+                audio_transition_duration = 0.01
+
+            output = f"audio_transition_{index}"
+
+            filters.append(
+                f"{label(current_audio)}"
+                f"{label(f'src_a{index}')}"
+                f"acrossfade="
+                f"d={audio_transition_duration:.6f}:"
+                f"c1=tri:"
+                f"c2=tri"
+                f"{label(output)}"
+            )
+
+            current_audio = output
+
+        final_audio_label = current_audio
+
+    # --------------------------------------------------------
+    # Music
+    # --------------------------------------------------------
+
+    music_labels = []
+
+    # Global music
+    #
+    # Globale Musik wird nur dort verwendet, wo kein
+    # clip-spezifisches 'music' definiert wurde.
+    #
+    # Wenn ein Clip 'music' besitzt, überschreibt diese
+    # Musik die globale Musik für diesen Clip.
+    #
+    # Dafür erzeugen wir bei globaler Musik zunächst
+    # einen vollständigen Musikstream und verwenden ihn
+    # anschließend als Hintergrund.
+    #
+    # Die explizite Clip-Musik wird zusätzlich gemischt.
+    # --------------------------------------------------------
+
+    if global_music_input_index is not None:
+
+        global_music_start = settings.get(
+            "music_start",
+            "00:00"
+        )
+
+        global_music_volume = float(
+            settings.get(
+                "music_volume",
+                0.18
+            )
+        )
+
+        global_music_label = add_global_music(
+            filters=filters,
+            music_input_index=global_music_input_index,
+            music_start=global_music_start,
+            music_volume=global_music_volume,
+            total_duration=total_duration
+        )
+
+        music_labels.append(
+            global_music_label
+        )
+
+    # Clip-spezifische Musik
+    for index, music_input_index in element_music_inputs.items():
+
+        clip_music = add_music(
+            filters=filters,
+            clip=resolved_clips[index]["clip"],
+            index=index,
+            input_index=music_input_index,
+            total_duration=resolved_clips[index]["duration"],
+            settings=settings
+        )
+
+        if clip_music:
+            music_labels.append(
+                clip_music
+            )
+
+    # --------------------------------------------------------
+    # Final Audio
+    # --------------------------------------------------------
+
+    if music_labels:
+
+        # Normale globale Musik:
+        #
+        # Falls einzelne Clips eigene Musik besitzen,
+        # wird diese zusätzlich gemischt. Das bedeutet:
+        #
+        # global music = Hintergrund
+        # clip music   = zusätzliche Musik
+        #
+        # Für eine echte harte "Override"-Funktion kann
+        # später eine Ducking-/Timeline-Mischung ergänzt werden.
+
+        mix_inputs = [final_audio_label] + music_labels
+
+        mix_count = len(mix_inputs)
+
+        filters.append(
+            "".join(label(x) for x in mix_inputs)
+            +
+            f"amix="
+            f"inputs={mix_count}:"
+            f"duration=first:"
+            f"dropout_transition=0:"
+            f"normalize=0"
+            f"{label('final_audio')}"
+        )
+
+        final_audio_label = "final_audio"
+
+    else:
+
+        final_audio_label = final_audio_label
+
+    # --------------------------------------------------------
+    # Filter graph
+    # --------------------------------------------------------
+
+    filter_complex = ";".join(filters)
+
+    print("\n========== FILTER GRAPH ==========\n")
+    print(filter_complex)
+    print("\n===================================\n")
+
+    # --------------------------------------------------------
+    # Output
+    # --------------------------------------------------------
+
+    output_value = config.get(
+        "output",
+        "reel.mp4"
+    )
+
+    output_path = resolve_path(
+        base_dir,
+        output_value
+    )
+
+    output_path.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    # --------------------------------------------------------
+    # FFmpeg command
+    # --------------------------------------------------------
+
+    cmd = [
+        "ffmpeg",
+        "-y",
+        *inputs,
+
         "-filter_complex",
         filter_complex,
 
         "-map",
-        f"[{current_video}]",
+        label(final_video_label),
 
         "-map",
-        f"[{final_audio}]",
+        label(final_audio_label),
 
         "-c:v",
         "libx264",
@@ -1698,6 +1281,9 @@ def build(
         "-pix_fmt",
         "yuv420p",
 
+        "-r",
+        str(fps),
+
         "-c:a",
         "aac",
 
@@ -1707,104 +1293,29 @@ def build(
         "-movflags",
         "+faststart",
 
-        "-shortest",
+        "-t",
+        f"{total_duration:.6f}",
 
-        str(output_path),
+        str(output_path)
     ]
 
-    # ========================================================
-    # Ausführen
-    # ========================================================
-
-    print()
-    print("=" * 60)
-    print("REEL COMPILER")
-    print("=" * 60)
+    run(cmd)
 
     print(
-        f"Clips:       {len(clips)}"
+        "\n========================================"
     )
-
+    print("REEL ERFOLGREICH ERSTELLT")
     print(
-        f"Auflösung:   {width}x{height}"
+        f"Output: {output_path}"
     )
-
     print(
-        f"FPS:         {fps}"
+        f"Dauer : {total_duration:.2f}s"
     )
-
     print(
-        f"Übergang:    {transition}"
+        f"Format: {width}x{height} @ {fps}fps"
     )
-
     print(
-        f"Übergangsdauer: {transition_duration}s"
-    )
-
-    print(
-        f"Musik:       "
-        f"{'global' if global_music else 'pro Clip'}"
-    )
-
-    print(
-        f"Ausgabe:     {output_path}"
-    )
-
-    print("=" * 60)
-
-    run_command(
-        command
-    )
-
-    print()
-    print("=" * 60)
-    print("FERTIG")
-    print("=" * 60)
-    print()
-    print(
-        output_path
-    )
-
-
-# ============================================================
-# Main
-# ============================================================
-
-def main() -> None:
-
-    if len(sys.argv) != 2:
-
-        print(
-            "Aufruf:"
-        )
-
-        print(
-            "    python reel_compiler.py reel.json"
-        )
-
-        sys.exit(2)
-
-    check_ffmpeg()
-
-    config_path = Path(
-        sys.argv[1]
-    ).resolve()
-
-    if not config_path.exists():
-
-        die(
-            f"Konfigurationsdatei nicht gefunden:\n"
-            f"{config_path}"
-        )
-
-    if config_path.suffix.lower() != ".json":
-
-        print(
-            "WARNUNG: Die Config hat keine .json-Endung."
-        )
-
-    build(
-        config_path
+        "========================================"
     )
 
 

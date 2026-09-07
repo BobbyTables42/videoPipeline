@@ -1,13 +1,13 @@
 {
   "generateClip": false,
 
-  "input": "../videoRaw/20260823_203242.mp4",
-  "output": "00008_20260823_203242.mp4",
+  "input": "../videoRaw/20260825_135424.mp4",
+  "output": "00021_20260825_135424.mp4",
 
-  "keywords": ["spielen"],
+  "keywords": ["fressen"],
 
-  "start": "00:04",
-  "end": "00:11",
+  "start": "00:03",
+  "end": "00:08",
 
   "resolution": "1080x1920",
 

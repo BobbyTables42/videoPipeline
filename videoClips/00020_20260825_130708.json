@@ -1,12 +1,12 @@
 {
   "generateClip": false,
 
-  "input": "../videoRaw/20260823_203242.mp4",
-  "output": "00008_20260823_203242.mp4",
+  "input": "../videoRaw/20260825_130708.mp4",
+  "output": "00020_20260825_130708.mp4",
 
-  "keywords": ["spielen"],
+  "keywords": ["schlafen"],
 
-  "start": "00:04",
+  "start": "00:00",
   "end": "00:11",
 
   "resolution": "1080x1920",

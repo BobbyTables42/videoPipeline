@@ -25,6 +25,8 @@ for filename in $(ls *.json); do
 
 
   python ../scripts/clipexport.py $filename
+
+  sed -i "s/^\(.*\"generateClip\":.*\)true,$/\1false,/" $filename
 done
 
 

@@ -1,5 +1,5 @@
 {
-  "generateClip": true,
+  "generateClip": false,
 
   "input": "../videoRaw/20260823_213722.mp4",
   "output": "00010_20260823_213722.mp4",

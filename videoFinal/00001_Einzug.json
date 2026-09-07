@@ -1,4 +1,5 @@
 {
+"generateClip": false,
 
 "output": "00001_Einzug.mp4",
 
@@ -42,6 +43,18 @@
 "clips": [
 
     {
+      "type": "image",
+      "file": "../images/00001_ChatGPT.png",
+      "duration": 3,
+      "text": [
+        "Ein neuer Hund",
+        "zieht ein"
+      ],
+      "text_position": "bottom"
+    },
+
+    {
+        "type": "video",
         "file": "../videoClips/00001_20260823_111413.mp4",
 
         "start": "00:01",
@@ -56,6 +69,7 @@
     },
 
     {
+        "type": "video",
         "file": "../videoClips/00002_20260823_164834.mp4",
 
         "start": "00:03",
@@ -73,6 +87,7 @@
     },
 
     {
+        "type": "video",
         "file": "../videoClips/00003_20260823_184950.mp4",
 
         "start": "00:00",
@@ -90,6 +105,7 @@
     },
 
     {
+        "type": "video",
         "file": "../videoClips/00004_20260823_194942.mp4",
 
         "start": "00:01",
@@ -107,6 +123,7 @@
     },
 
     {
+        "type": "video",
         "file": "../videoClips/00005_20260823_201224.mp4",
 
         "start": "00:00",
@@ -124,6 +141,7 @@
     },
 
     {
+        "type": "video",
         "file": "../videoClips/00006_20260823_202053.mp4",
 
         "start": "00:01",
@@ -141,6 +159,7 @@
     },
 
     {
+        "type": "video",
         "file": "../videoClips/00007_20260823_202841.mp4",
 
         "start": "00:06",
@@ -158,6 +177,7 @@
     },
 
     {
+        "type": "video",
         "file": "../videoClips/00008_20260823_203242.mp4",
 
         "start": "00:00",
@@ -175,6 +195,7 @@
     },
 
     {
+        "type": "video",
         "file": "../videoClips/00009_20260823_204639.mp4",
 
         "start": "00:00",
@@ -192,6 +213,7 @@
     },
 
     {
+        "type": "video",
         "file": "../videoClips/00010_20260823_213722.mp4",
 
         "start": "00:00",

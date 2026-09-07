@@ -1,0 +1,186 @@
+{
+"generateClip": true,
+
+"output": "00002_ErsteSchritte.mp4",
+
+"settings": {
+
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+
+
+    "font": "../fonts/folks/Folks-Bold.ttf",
+
+    "text_style": {
+
+        "fontsize": 80,
+        "fontcolor": "white",
+        "boxcolor": "black@0.45",
+        "box": 1,
+        "boxborderw": 18,
+        "margin_x": 200,
+        "margin_y": 300
+    },
+
+
+    "transition": "fade",
+    "transition_duration": 0.75,
+
+
+    "source_volume": 1.0,
+    "music": "../music/cinematic-soul-upbeat-background-music-low-resolution-love-587083.mp3",
+    "music_volume": 1.0,
+    "music_start": "00:00",
+
+    "preset": "slower",
+    "crf": 15,
+    "audio_bitrate": "192k"
+},
+
+
+"clips": [
+
+    {
+      "type": "image",
+      "file": "../images/00002_ChatGPT.png",
+      "duration": 3,
+      "text": [
+        "Herausforderungen",
+        "der ersten Tage"
+      ],
+      "text_position": "bottom"
+    },
+
+    {
+        "type": "video",
+        "file": "../videoClips/00011_20260824_121543.mp4",
+
+        "start": "00:02",
+        "end": "00:07",
+
+        "text": [
+            "[x] Gleichgewicht"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "type": "video",
+        "file": "../videoClips/00018_20260824_181752.mp4",
+
+        "start": "00:00",
+        "end": "00:07",
+
+        "text": [
+            "[x] Rute fangen"
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "type": "video",
+        "file": "../videoClips/00014_20260824_142137.mp4",
+
+        "start": "00:03",
+        "end": "00:07",
+
+        "text": [
+            "[  ] Fliegengitter"
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "type": "video",
+        "file": "../videoClips/00019_20260825_124545.mp4",
+
+        "start": "00:00",
+        "end": "00:05",
+
+        "text": [
+            "[x] Fliegengitter"
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "type": "video",
+        "file": "../videoClips/00025_20260826_145556.mp4",
+
+        "start": "00:00",
+        "end": "00:08",
+
+        "text": [
+            "[x] Rucksack"
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "type": "video",
+        "file": "../videoClips/00026_20260826_191405.mp4",
+
+        "start": "00:04",
+        "end": "00:08",
+
+        "text": [
+            "Was ist das denn?"
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "type": "video",
+        "file": "../videoClips/00028_20260827_163558.mp4",
+
+        "start": "00:00",
+        "end": "00:04",
+
+        "text": [
+            "[  ] Bürste"
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "type": "video",
+        "file": "../videoClips/00029_20260827_180437.mp4",
+
+        "start": "00:00",
+        "end": "00:04",
+
+        "text": [
+            "[x] Bürste"
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    }
+
+]
+
+}

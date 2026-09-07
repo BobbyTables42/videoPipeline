@@ -1,0 +1,126 @@
+{
+"generateClip": true,
+
+"output": "00003_MopsUndNatur.mp4",
+
+"settings": {
+
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+
+
+    "font": "../fonts/folks/Folks-Bold.ttf",
+
+    "text_style": {
+
+        "fontsize": 80,
+        "fontcolor": "white",
+        "boxcolor": "black@0.45",
+        "box": 1,
+        "boxborderw": 18,
+        "margin_x": 200,
+        "margin_y": 300
+    },
+
+
+    "transition": "fade",
+    "transition_duration": 0.25,
+
+
+    "source_volume": 1.0,
+    "music": "../music/alex-morgan-determination-motivational-speech-background-music-587391.mp3",
+    "music_volume": 0.18,
+    "music_start": "00:00",
+
+    "preset": "ultrafast",
+    "crf": 15,
+    "audio_bitrate": "192k"
+},
+
+
+"clips": [
+
+    {
+        "file": "../videoClips/00013_20260824_141330.mp4",
+
+        "start": "00:01",
+        "end": "00:06",
+
+        "text": [
+            "Der beste Platz ist",
+            "in der Sonne"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "file": "../videoClips/00016_20260824_164122.mp4",
+
+        "start": "00:01",
+        "end": "00:05",
+
+        "text": [
+            "Grashalme",
+            "bändigen"
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "file": "../videoClips/00021_20260825_135424.mp4",
+
+        "start": "00:00",
+        "end": "00:00",
+
+        "text": [
+            "Dieses Gras piekst ...",
+            ""
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "file": "../videoClips/00022_20260825_153809.mp4",
+
+        "start": "00:00",
+        "end": "00:00",
+
+        "text": [
+            "... doch nicht so wild",
+            ""
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "file": "../videoClips/00027_20260826_191405.mp4",
+
+        "start": "00:00",
+        "end": "00:03",
+
+        "text": [
+            "eine Runde rennen",
+            ""
+        ],
+        "text_position": "top",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.18
+    }
+]
+
+}

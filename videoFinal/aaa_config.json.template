@@ -13,13 +13,13 @@
 
     "text_style": {
 
-        "fontsize": 64,
+        "fontsize": 80,
         "fontcolor": "white",
         "boxcolor": "black@0.45",
         "box": 1,
         "boxborderw": 18,
-        "margin_x": 60,
-        "margin_y": 100
+        "margin_x": 200,
+        "margin_y": 300
     },
 
 
