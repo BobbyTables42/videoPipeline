@@ -1,17 +1,17 @@
 {
-  "generateClip": true,
+  "generateClip": false,
 
-  "input": "../videoRaw/__NAME_OF_INPUT__.mp4",
-  "output": "__NAME_OF_OUTPUT__.mp4",
+  "input": "../videoRaw/20260902_160738.mp4",
+  "output": "00050_20260902_160738.mp4",
 
   "keywords": ["fressen", "spaziergang", "spielen", "ball"],
 
-  "start": "00:00",
-  "end": "00:12",
+  "start": "00:04",
+  "end": "00:09",
 
   "resolution": "1080x1920",
 
-  "crop": "center",
+  "crop": "dog",
 
   "model": "yolo11n.pt",
   "confidence": 0.35,

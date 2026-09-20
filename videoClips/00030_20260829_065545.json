@@ -1,12 +1,12 @@
 {
-  "generateClip": true,
+  "generateClip": false,
 
-  "input": "../videoRaw/__NAME_OF_INPUT__.mp4",
-  "output": "__NAME_OF_OUTPUT__.mp4",
+  "input": "../videoRaw/20260829_065545.mp4",
+  "output": "00030_20260829_065545.mp4",
 
-  "keywords": ["fressen", "spaziergang", "spielen", "ball"],
+  "keywords": ["fressen", "verstecken"],
 
-  "start": "00:00",
+  "start": "00:04",
   "end": "00:12",
 
   "resolution": "1080x1920",

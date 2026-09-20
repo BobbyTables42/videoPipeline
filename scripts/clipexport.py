@@ -1176,8 +1176,6 @@ def main():
 
     args = parser.parse_args()
 
-    check_ffmpeg()
-
     config_path = (
         Path(args.config)
         .resolve()
@@ -1205,6 +1203,7 @@ def main():
             f"Do Not Generate"
         )
 
+    check_ffmpeg()
 
     # --------------------------------------------------------
     # Eingaben

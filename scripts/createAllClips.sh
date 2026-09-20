@@ -5,6 +5,14 @@ pushd ../videoClips > /dev/null
 
 for filename in $(ls *.json); do
 
+  # abort if generate=false, grep returns 0 if no lines were found
+  egrep "\"generateClip\": false," $filename
+  if [ $? == 0 ] ;
+  then
+    echo "Do not generate";
+    continue
+  fi
+
   # change __NAME_OF_OUTPUT__ in myConfig.json to myConfig (video output = config name)
   filenameNoExtension=$(basename $filename .json)
   echo datei $filename - $filenameNoExtension

@@ -1,13 +1,13 @@
 {
-  "generateClip": true,
+  "generateClip": false,
 
-  "input": "../videoRaw/__NAME_OF_INPUT__.mp4",
-  "output": "__NAME_OF_OUTPUT__.mp4",
+  "input": "../videoRaw/20260903_152443.mp4",
+  "output": "00041_20260903_152443.mp4",
 
-  "keywords": ["fressen", "spaziergang", "spielen", "ball"],
+  "keywords": ["unsinn"],
 
   "start": "00:00",
-  "end": "00:12",
+  "end": "00:8",
 
   "resolution": "1080x1920",
 

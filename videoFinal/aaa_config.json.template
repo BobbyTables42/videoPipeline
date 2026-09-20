@@ -1,4 +1,5 @@
 {
+"generateClip": true,
 
 "output": "__NAME_OF_OUTPUT__.mp4",
 
@@ -29,7 +30,7 @@
 
     "source_volume": 1.0,
     "music": "../music/alex-morgan-determination-motivational-speech-background-music-587391.mp3",
-    "music_volume": 0.18,
+    "music_volume": 1.0,
     "music_start": "00:00",
 
     "preset": "ultrafast",
@@ -40,6 +41,16 @@
 
 "clips": [
 
+    {
+      "type": "image",
+      "file": "../images/00002_ChatGPT.png",
+      "duration": 3,
+      "text": [
+        "",
+        ""
+      ],
+      "text_position": "bottom"
+    },
     {
         "file": "__CLIP_00000_CLIP__",
 
@@ -52,9 +63,9 @@
         ],
         "text_position": "top",
 
-        "source_volume": 1.0,
+        "source_volume": 0.0,
         "music": null,
-        "music_volume": 0.18
+        "music_volume": 1.0
     },
 ]
 

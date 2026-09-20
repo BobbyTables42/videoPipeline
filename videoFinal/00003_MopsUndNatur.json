@@ -1,5 +1,5 @@
 {
-"generateClip": true,
+"generateClip": false,
 
 "output": "00003_MopsUndNatur.mp4",
 
@@ -16,7 +16,7 @@
 
         "fontsize": 80,
         "fontcolor": "white",
-        "boxcolor": "black@0.45",
+        "boxcolor": "darkgreen@0.55",
         "box": 1,
         "boxborderw": 18,
         "margin_x": 200,
@@ -28,12 +28,12 @@
     "transition_duration": 0.25,
 
 
-    "source_volume": 1.0,
-    "music": "../music/alex-morgan-determination-motivational-speech-background-music-587391.mp3",
-    "music_volume": 0.18,
-    "music_start": "00:00",
+    "source_volume": 0.0,
+    "music": "../music/solarflex-no-copyright-music-515495.mp3",
+    "music_volume": 1.0,
+    "music_start": "00:09",
 
-    "preset": "ultrafast",
+    "preset": "slower",
     "crf": 15,
     "audio_bitrate": "192k"
 },
@@ -42,22 +42,32 @@
 "clips": [
 
     {
-        "file": "../videoClips/00013_20260824_141330.mp4",
-
-        "start": "00:01",
-        "end": "00:06",
-
-        "text": [
-            "Der beste Platz ist",
-            "in der Sonne"
-        ],
-        "text_position": "bottom",
-
-        "source_volume": 1.0,
-        "music": null,
-        "music_volume": 0.18
+      "type": "image",
+      "file": "../images/00003_ChatGPT.png",
+      "duration": 3,
+      "text": [
+        "Skari im Garten",
+        ""
+      ],
+      "text_position": "bottom"
     },
     {
+        "file": "../videoClips/00037_20260831_131555.mp4",
+
+        "start": "00:00",
+        "end": "00:04",
+
+        "text": [
+            "Endlich raus in",
+            "den Garten"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+        {
         "file": "../videoClips/00016_20260824_164122.mp4",
 
         "start": "00:01",
@@ -69,23 +79,40 @@
         ],
         "text_position": "top",
 
-        "source_volume": 1.0,
+        "source_volume": 0.0,
         "music": null,
         "music_volume": 0.18
     },
     {
-        "file": "../videoClips/00021_20260825_135424.mp4",
+        "file": "../videoClips/00013_20260824_141330.mp4",
 
-        "start": "00:00",
-        "end": "00:00",
+        "start": "00:01",
+        "end": "00:06",
 
         "text": [
-            "Dieses Gras piekst ...",
-            ""
+            "Ein bisschen in der",
+            "Sonne liegen"
         ],
-        "text_position": "top",
+        "text_position": "bottom",
 
-        "source_volume": 1.0,
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+
+    {
+        "file": "../videoClips/00021_20260825_135424.mp4",
+
+        "start": "00:02",
+        "end": "00:04",
+
+        "text": [
+            "Pieksende Halme",
+            "erkunden"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
         "music": null,
         "music_volume": 0.18
     },
@@ -93,15 +120,32 @@
         "file": "../videoClips/00022_20260825_153809.mp4",
 
         "start": "00:00",
-        "end": "00:00",
+        "end": "00:06",
 
         "text": [
-            "... doch nicht so wild",
-            ""
+            "Piekst doch nicht",
+            "so wild"
         ],
-        "text_position": "top",
+        "text_position": "bottom",
 
-        "source_volume": 1.0,
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "file": "../videoClips/00049_20260906_123154.mp4",
+
+        "start": "00:00",
+        "end": "00:05",
+
+        "text": [
+            "Der hier piekst",
+            "gar nicht.",
+            "Noch besser"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
         "music": null,
         "music_volume": 0.18
     },
@@ -112,10 +156,42 @@
         "end": "00:03",
 
         "text": [
-            "eine Runde rennen",
+            "Eine Runde rennen",
             ""
         ],
         "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+        {
+        "file": "../videoClips/00050_20260902_160738.mp4",
+
+        "start": "00:00",
+        "end": "00:00",
+
+        "text": [
+            "Und noch eine",
+            ""
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 0.18
+    },
+    {
+        "file": "../videoClips/00040_20260902_160351.mp4",
+
+        "start": "00:00",
+        "end": "00:00",
+
+        "text": [
+            "Und natürlich bei der",
+            "Gartenarbeit helfen"
+        ],
+        "text_position": "bottom",
 
         "source_volume": 1.0,
         "music": null,

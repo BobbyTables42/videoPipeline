@@ -730,6 +730,12 @@ def main():
 
     base_dir = config_path.parent
 
+    generateClip = config.get("generateClip", False)
+    if not generateClip:
+        die(
+            f"Do Not Generate"
+        )
+
     settings = config.get("settings", {})
     clips = config.get("clips", [])
 

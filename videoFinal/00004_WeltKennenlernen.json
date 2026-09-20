@@ -1,0 +1,153 @@
+{
+"generateClip": true,
+
+"output": "00004_WeltKennenlernen.mp4",
+
+"settings": {
+
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+
+
+    "font": "../fonts/folks/Folks-Bold.ttf",
+
+    "text_style": {
+
+        "fontsize": 80,
+        "fontcolor": "black",
+        "boxcolor": "lightblue@0.85",
+        "box": 1,
+        "boxborderw": 18,
+        "margin_x": 200,
+        "margin_y": 300
+    },
+
+
+    "transition": "fade",
+    "transition_duration": 0.25,
+
+
+    "source_volume": 1.0,
+    "music": "../music/gr0za-vlog-vlog-music-569715.mp3",
+    "music_volume": 1.0,
+    "music_start": "00:45",
+
+    "preset": "slower",
+    "crf": 15,
+    "audio_bitrate": "192k"
+},
+
+
+"clips": [
+
+    {
+      "type": "image",
+      "file": "../images/00004_ChatGPT.png",
+      "duration": 3,
+      "text": [
+        "Erste Schritte",
+        "in die Welt"
+      ],
+      "text_position": "bottom"
+    },
+    {
+        "file": "../videoClips/00038_20260901_170737.mp4",
+
+        "start": "00:00",
+        "end": "00:04",
+
+        "text": [
+            "Kurze",
+            "Spaziergänge"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00039_20260831_130952.mp4",
+
+        "start": "00:00",
+        "end": "00:00",
+
+        "text": [
+            "Bei Fuß üben",
+            "wir noch"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00043_20260904_171711.mp4",
+
+        "start": "00:00",
+        "end": "00:03",
+
+        "text": [
+            "Mit Stöckchen",
+            "geht\\'s besser"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00045_20260905_122233.mp4",
+
+        "start": "00:01",
+        "end": "00:12",
+
+        "text": [
+            "Andere Hunde in",
+            "der Welpengruppe"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00046_20260905_133115.mp4",
+
+        "start": "00:04",
+        "end": "00:00",
+
+        "text": [
+            "All die Eindrücke",
+            "beim Einkaufen"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00033_20260829_082708.mp4",
+
+        "start": "00:00",
+        "end": "00:08",
+
+        "text": [
+            "Wichtig\\: viel",
+            "Schlaf, um alles",
+            "zu verarbeiten"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 1.0,
+        "music": null,
+        "music_volume": 0.0
+    }
+]
+
+}
