@@ -1,0 +1,153 @@
+{
+"generateClip": true,
+
+"output": "00006_Training.mp4",
+
+"settings": {
+
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+
+
+    "font": "../fonts/folks/Folks-Bold.ttf",
+
+    "text_style": {
+
+        "fontsize": 80,
+        "fontcolor": "#008080",
+        "boxcolor": "#FAF3E0@1",
+        "box": 1,
+        "boxborderw": 18,
+        "margin_x": 200,
+        "margin_y": 300
+    },
+
+
+    "transition": "fade",
+    "transition_duration": 0.25,
+
+
+    "source_volume": 1.0,
+    "music": "../music/ikoliks-born-to-fly-no-copyright-music-background-corporate-497685.mp3",
+    "music_volume": 1.0,
+    "music_start": "00:00",
+
+    "preset": "slower",
+    "crf": 15,
+    "audio_bitrate": "192k"
+},
+
+
+"clips": [
+
+    {
+      "type": "image",
+      "file": "../images/00006_ChatGPT.png",
+      "duration": 3,
+      "text": [
+        "Erste",
+        "Trainingserfolge"
+      ],
+      "text_position": "bottom"
+    },
+    {
+        "file": "../videoClips/00055_20260909_194326.mp4",
+
+        "start": "00:00",
+        "end": "00:06",
+
+        "text": [
+            "Zähneputzen",
+            "wird toleriert"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00058_20260910_132730.mp4",
+
+        "start": "00:00",
+        "end": "00:00",
+
+        "text": [
+            "Sitz macht sie schon",
+            "ziemlich gut"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00063_20260913_153411.mp4",
+
+        "start": "00:00",
+        "end": "00:03",
+
+        "text": [
+            "Spaziergänge klappen",
+            "inzwischen deutlich",
+            "besser"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00061_20260912_153851.mp4",
+
+        "start": "00:00",
+        "end": "00:03",
+
+        "text": [
+            "Gewöhnung an die",
+            "Dusche"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00062_20260912_154612.mp4",
+
+        "start": "00:00",
+        "end": "00:04",
+
+        "text": [
+            "Auch ohne Leckmatte",
+            "wohl ganz okay"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00069_20260915_182618.mp4",
+
+        "start": "00:00",
+        "end": "00:00",
+
+        "text": [
+            "Erste Besuche im",
+            "Einkaufszentrum"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    }
+]
+
+}
