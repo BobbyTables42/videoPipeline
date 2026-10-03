@@ -1,0 +1,185 @@
+{
+"generateClip": false,
+
+"output": "00005_Unsinn.mp4",
+
+"settings": {
+
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+
+
+    "font": "../fonts/folks/Folks-Bold.ttf",
+
+    "text_style": {
+
+        "fontsize": 80,
+        "fontcolor": "white",
+        "boxcolor": "purple@0.65",
+        "box": 1,
+        "boxborderw": 18,
+        "margin_x": 200,
+        "margin_y": 300
+    },
+
+
+    "transition": "fade",
+    "transition_duration": 0.25,
+
+
+    "source_volume": 1.0,
+    "music": "../music/arpmedia-no-copyright-music-569456.mp3",
+    "music_volume": 1.0,
+    "music_start": "00:17",
+
+    "preset": "slower",
+    "crf": 15,
+    "audio_bitrate": "192k"
+},
+
+
+"clips": [
+
+    {
+      "type": "image",
+      "file": "../images/00005_ChatGPT.png",
+      "duration": 3,
+      "text": [
+        "Was Skari so macht",
+        "wenn sie eigentlich",
+        "schlafen soll..."
+      ],
+      "text_position": "bottom"
+    },
+    {
+        "file": "../videoClips/00041_20260903_152443.mp4",
+
+        "start": "00:00",
+        "end": "00:03",
+
+        "text": [
+            "Am Rucksack ziehen",
+            ""
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00042_20260904_093005.mp4",
+
+        "start": "00:00",
+        "end": "00:03",
+
+        "text": [
+            "Im Kissen buddeln",
+            ""
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+        {
+        "file": "../videoClips/00064_20260915_071927.mp4",
+
+        "start": "00:00",
+        "end": "00:04",
+
+        "text": [
+            "Schaf-Fell",
+            "malträtieren"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00066_20260915_112459.mp4",
+
+        "start": "00:01",
+        "end": "00:00",
+
+        "text": [
+            "Am Fliegengitter",
+            "ziehen ..."
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00067_20260915_112512.mp4",
+
+        "start": "00:01",
+        "end": "00:04",
+
+        "text": [
+            "... oder aus Frust",
+            "an der eigenen Rute"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00068_20260915_162737.mp4",
+
+        "start": "00:00",
+        "end": "00:05",
+
+        "text": [
+            "Das Bett",
+            "ausschütteln"
+        ],
+        "text_position": "top",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+    {
+        "file": "../videoClips/00070_20260915_202545.mp4",
+
+        "start": "00:00",
+        "end": "00:00",
+
+        "text": [
+            "Versuchen auf den",
+            "Tisch zu springen"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    },
+        {
+        "file": "../videoClips/00047_20260905_183534.mp4",
+
+        "start": "00:03",
+        "end": "00:00",
+
+        "text": [
+            "Aber wer könnte so einem",
+            "süßen Mops böse sein"
+        ],
+        "text_position": "bottom",
+
+        "source_volume": 0.0,
+        "music": null,
+        "music_volume": 1.0
+    }
+]
+
+}

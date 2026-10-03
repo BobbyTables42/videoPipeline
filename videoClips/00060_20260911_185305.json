@@ -1,0 +1,29 @@
+{
+  "generateClip": false,
+
+  "input": "../videoRaw/20260911_185305.mp4",
+  "output": "00060_20260911_185305.mp4",
+
+  "keywords": ["fressen", "spaziergang", "spielen", "ball"],
+
+  "start": "00:00",
+  "end": "00:04",
+
+  "resolution": "1080x1920",
+
+  "crop": "center",
+
+  "model": "yolo11n.pt",
+  "confidence": 0.35,
+  "detection_interval": 0.20,
+
+  "smoothing": 0.18,
+  "margin": 0.20,
+
+  "zoom": 1.05,
+  "min_zoom": 0.85,
+  "max_zoom": 1.35,
+
+  "multi_dog_mode": "all",
+  "save_camera_plan": false
+}
